@@ -7,9 +7,12 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 from src import coarse_to_fine
+from src import image_contrast
+from src import image_crop
+from src import white_balance
 
 # name of the input file
-imname = 'data/railroad.tif'
+imname = 'data/Gruppa.tif'
 
 # read in the image as grayscale (the glass plate scan is stacked grayscale)
 im = cv.imread(imname, cv.IMREAD_GRAYSCALE)
@@ -36,6 +39,10 @@ print(f"G_offset={offsetg} R_offset={offsetr}")
 
 # create a color image
 im_out = np.dstack([ar, ag, b])
+im_out = image_crop.crop_common_overlap(im_out, [offsetg, offsetr])
+im_out = image_crop.crop_black_border(im_out)
+im_out = white_balance.gray_world(im_out)
+im_out = image_contrast.automatic_contrast(im_out)
 
 # display the image using matplotlib (expects RGB)
 plt.figure(figsize=(8, 8))

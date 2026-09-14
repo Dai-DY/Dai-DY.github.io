@@ -25,6 +25,9 @@
             --line: #d8d7cf;
             --warning: #8a4b2c;
             --warning-soft: #f6e7dc;
+            --sidebar-width: clamp(248px, 19vw, 288px);
+            --content-gap: clamp(28px, 3vw, 48px);
+            --anchor-offset: 28px;
         }
 
         * {
@@ -42,77 +45,113 @@
             font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
-        main {
-            width: min(1120px, calc(100% - 250px));
-            margin-right: auto;
-            margin-left: 220px;
+        main,
+        .page-top {
+            width: calc(100% - var(--sidebar-width) - var(--content-gap) - 32px);
+            margin: 0 32px 0 calc(var(--sidebar-width) + var(--content-gap));
         }
 
-        .bookmark-nav {
-            position: fixed;
-            z-index: 20;
-            top: 50%;
-            left: 0;
-            width: 184px;
-            max-height: calc(100vh - 32px);
-            padding: 18px 14px 18px 20px;
-            overflow-y: auto;
-            background: rgba(255, 253, 247, 0.96);
-            border: 1px solid var(--line);
-            border-left: 0;
-            border-radius: 0 18px 18px 0;
-            box-shadow: 0 12px 36px rgba(28, 39, 33, 0.12);
-            transform: translateY(-50%);
-            backdrop-filter: blur(12px);
+        .page-top {
+            padding-top: 20px;
         }
 
-        .bookmark-nav .back-link {
-            display: block;
-            padding: 0 6px 14px;
-            border-bottom: 1px solid var(--line);
+        .back-link {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            min-height: 36px;
             color: var(--accent);
             font-size: 0.92rem;
             font-weight: 700;
             text-decoration: none;
         }
 
-        .bookmark-label {
-            margin: 14px 6px 8px;
-            color: var(--muted);
-            font-size: 0.68rem;
-            font-weight: 800;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
+        .back-link:hover,
+        .back-link:focus-visible {
+            text-decoration: underline;
+            text-underline-offset: 4px;
         }
 
-        .bookmark-nav a:not(.back-link) {
+        .bookmark-nav {
+            position: fixed;
+            z-index: 20;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            padding: 14px 12px;
+            background: rgba(255, 253, 247, 0.7);
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            border-radius: 0 0 12px 0;
+            backdrop-filter: blur(12px);
+        }
+
+        .bookmark-toggle {
+            display: none;
+        }
+
+        .bookmark-list,
+        .bookmark-children {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .bookmark-list {
             display: grid;
-            grid-template-columns: 24px minmax(0, 1fr);
-            gap: 6px;
-            align-items: baseline;
-            padding: 7px 6px;
-            color: var(--ink);
-            border-radius: 9px;
-            font-size: 0.8rem;
-            font-weight: 650;
-            line-height: 1.25;
-            text-decoration: none;
+            gap: 8px;
         }
 
-        .bookmark-nav a:hover {
+        .bookmark-group {
+            min-width: 0;
+        }
+
+        .bookmark-nav a {
+            display: block;
+            padding: 2px 8px;
+            color: var(--muted);
+            border-radius: 5px;
+            font-size: 0.8rem;
+            line-height: 1.3;
+            text-decoration: none;
+            transition: color 150ms ease, background-color 150ms ease;
+        }
+
+        .bookmark-nav a:hover,
+        .bookmark-nav a:focus-visible,
+        .bookmark-nav a[aria-current="location"] {
             color: var(--accent);
             background: var(--accent-soft);
         }
 
-        .bookmark-index {
+        .bookmark-nav .bookmark-heading {
+            color: var(--ink);
+            font-size: 0.71rem;
+            font-weight: 750;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+
+        .bookmark-group.is-current-section > .bookmark-heading {
             color: var(--accent);
-            font-size: 0.67rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
+        }
+
+        .bookmark-children {
+            margin: 2px 0 0 8px;
+            padding-left: 6px;
+            border-left: 1px solid var(--line);
+        }
+
+        .bookmark-children a[aria-current="location"] {
+            box-shadow: -2px 0 0 var(--accent);
+        }
+
+        main [id] {
+            scroll-margin-top: var(--anchor-offset);
         }
 
         header {
-            padding: 72px 0 42px;
+            padding: 32px 0 42px;
         }
 
         .eyebrow {
@@ -132,15 +171,14 @@
         }
 
         h1 {
-            max-width: 980px;
             margin: 0;
-            font-size: clamp(2.7rem, 7vw, 5.3rem);
+            font-size: clamp(2.4rem, 5vw, 5.3rem);
             letter-spacing: -0.045em;
-            line-height: 0.98;
+            line-height: 1.08;
         }
 
         .subtitle {
-            max-width: 760px;
+            max-width: 940px;
             margin: 26px 0 0;
             color: var(--muted);
             font-size: 1.05rem;
@@ -160,7 +198,6 @@
 
         .project-section {
             padding: 0 0 88px;
-            scroll-margin-top: 28px;
         }
 
         .section-title {
@@ -228,6 +265,63 @@
 
         .photo-grid.three-up {
             grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .subsection-title {
+            margin: 0 0 16px;
+            font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+        }
+
+        .report-subsection,
+        .gallery-group {
+            margin-top: 40px;
+        }
+
+        .gallery-group .tag {
+            margin-bottom: 12px;
+        }
+
+        .photo-grid.three-up figcaption {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .photo-grid.three-up .photo-meta {
+            text-align: left;
+        }
+
+        .image-placeholder {
+            display: grid;
+            min-height: 240px;
+            aspect-ratio: 4 / 3;
+            place-content: center;
+            gap: 14px;
+            padding: 28px;
+            color: var(--warning);
+            background: var(--warning-soft);
+            border: 2px dashed #bd9377;
+            text-align: center;
+        }
+
+        .image-placeholder strong {
+            font-size: 1.1rem;
+        }
+
+        .image-placeholder span {
+            max-width: 28ch;
+            line-height: 1.6;
+        }
+
+        .comparison-grid figure img {
+            aspect-ratio: 4 / 3;
+            object-fit: contain;
+        }
+
+        .equation-card {
+            padding: 24px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 16px;
         }
 
         figure,
@@ -399,57 +493,106 @@
             font-size: 0.9rem;
         }
 
-        @media (min-width: 1660px) {
-            main {
-                margin-right: auto;
-                margin-left: auto;
+        @media (min-width: 981px) and (max-height: 700px) {
+            .bookmark-nav {
+                padding-block: 10px;
+            }
+
+            .bookmark-list {
+                gap: 6px;
+            }
+
+            .bookmark-nav a {
+                padding-block: 1px;
+                font-size: 0.75rem;
+            }
+
+            .bookmark-nav .bookmark-heading {
+                font-size: 0.69rem;
+            }
+        }
+
+        @media (min-width: 981px) and (max-height: 560px) {
+            .bookmark-nav {
+                position: absolute;
             }
         }
 
         @media (max-width: 980px) {
+            :root {
+                --anchor-offset: 76px;
+            }
+
+            .page-top {
+                padding: 14px 0;
+            }
+
             .bookmark-nav {
                 position: sticky;
                 top: 0;
-                display: flex;
                 width: 100%;
-                max-height: none;
-                gap: 4px;
-                align-items: center;
-                padding: 10px 14px;
-                overflow-x: auto;
-                overflow-y: hidden;
+                height: auto;
+                padding: 0 20px;
+                overflow: visible;
+                background: rgba(255, 253, 247, 0.96);
                 border: 0;
                 border-bottom: 1px solid var(--line);
                 border-radius: 0;
-                transform: none;
             }
 
-            .bookmark-nav .back-link {
-                flex: 0 0 auto;
-                margin-right: 4px;
-                padding: 7px 12px 7px 0;
-                border-right: 1px solid var(--line);
-                border-bottom: 0;
-                white-space: nowrap;
+            .bookmark-nav.is-enhanced .bookmark-toggle {
+                display: flex;
+                width: 100%;
+                min-height: 52px;
+                gap: 16px;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 0;
+                color: var(--accent);
+                background: none;
+                border: 0;
+                font: inherit;
+                font-size: 0.9rem;
+                font-weight: 700;
+                text-align: left;
+                cursor: pointer;
             }
 
-            .bookmark-label {
+            .bookmark-toggle::after {
+                content: "+";
+                font-size: 1.4rem;
+                line-height: 1;
+            }
+
+            .bookmark-toggle[aria-expanded="true"]::after {
+                content: "−";
+            }
+
+            .bookmark-list {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px 24px;
+                padding: 12px 0 20px;
+            }
+
+            .bookmark-nav.is-enhanced .bookmark-list {
                 display: none;
             }
 
-            .bookmark-nav a:not(.back-link) {
-                display: block;
-                flex: 0 0 auto;
-                padding: 7px 10px;
-                white-space: nowrap;
+            .bookmark-nav.is-open {
+                position: static;
             }
 
-            .bookmark-index {
-                margin-right: 5px;
+            .bookmark-nav.is-open .bookmark-list {
+                display: grid;
             }
 
-            main {
-                width: min(100% - 40px, 1120px);
+            .bookmark-children a {
+                padding-block: 10px;
+            }
+
+            main,
+            .page-top {
+                width: calc(100% - 40px);
                 margin: 0 auto;
             }
 
@@ -464,12 +607,17 @@
         }
 
         @media (max-width: 720px) {
-            main {
-                width: min(100% - 28px, 1120px);
+            main,
+            .page-top {
+                width: calc(100% - 28px);
             }
 
             header {
-                padding: 52px 0 34px;
+                padding: 28px 0 34px;
+            }
+
+            h1 {
+                font-size: clamp(2.2rem, 7vw, 3.2rem);
             }
 
             figcaption {
@@ -496,22 +644,87 @@
                 padding-bottom: 66px;
             }
         }
+
+        @media (max-width: 560px) {
+            .bookmark-nav {
+                padding-inline: 14px;
+            }
+
+            .bookmark-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html {
+                scroll-behavior: auto;
+            }
+
+            .bookmark-nav a {
+                transition: none;
+            }
+        }
     </style>
 </head>
 <body>
-    <aside class="bookmark-nav" aria-label="Project sections">
-        <a class="back-link" href="../"><span aria-hidden="true">←</span> Portfolio</a>
-        <p class="bookmark-label">On this page</p>
-        <a href="#overview"><span class="bookmark-index">01</span>Overview</a>
-        <a href="#single-scale"><span class="bookmark-index">02</span>Single scale</a>
-        <a href="#pyramid"><span class="bookmark-index">03</span>Image pyramid</a>
-        <a href="#results"><span class="bookmark-index">04</span>Results</a>
-        <a href="#features"><span class="bookmark-index">05</span>Better features</a>
-        <a href="#extras"><span class="bookmark-index">06</span>Extra images</a>
-        <a href="#bells"><span class="bookmark-index">07</span>Bells &amp; whistles</a>
-        <a href="#failures"><span class="bookmark-index">08</span>Failures</a>
-        <a href="#conclusion"><span class="bookmark-index">09</span>Conclusion</a>
-    </aside>
+    <nav class="page-top" aria-label="Breadcrumb">
+        <a class="back-link" href="../"><span aria-hidden="true">←</span> Back to portfolio</a>
+    </nav>
+
+    <nav class="bookmark-nav" aria-label="Project sections">
+        <button class="bookmark-toggle" type="button" aria-expanded="false" aria-controls="project-navigation">Project sections</button>
+        <ul class="bookmark-list" id="project-navigation">
+            <li class="bookmark-group">
+                <a class="bookmark-heading" href="#overview">Part 1 · Overview</a>
+            </li>
+            <li class="bookmark-group">
+                <a class="bookmark-heading" href="#single-scale">Part 2 · Single-Scale Alignment</a>
+                <ul class="bookmark-children">
+                    <li><a href="#metric-l2">L2 / mean squared error</a></li>
+                    <li><a href="#metric-ncc">Normalized cross-correlation</a></li>
+                </ul>
+            </li>
+            <li class="bookmark-group">
+                <a class="bookmark-heading" href="#pyramid">Part 3 · Image Pyramid</a>
+                <ul class="bookmark-children">
+                    <li><a href="#pyramid-process">Coarse-to-fine search</a></li>
+                    <li><a href="#pyramid-performance">Efficiency &amp; runtime</a></li>
+                    <li><a href="#pyramid-examples">Four TIFF examples</a></li>
+                    <li><a href="#emir-failure">Emir: pixel-matching failure</a></li>
+                </ul>
+            </li>
+            <li class="bookmark-group">
+                <a class="bookmark-heading" href="#features">Part 4 · Gradient Alignment</a>
+                <ul class="bookmark-children">
+                    <li><a href="#gradient-kernels">Sobel filters</a></li>
+                    <li><a href="#gradient-magnitude">Gradient magnitude</a></li>
+                    <li><a href="#gradient-matching">NCC on edges</a></li>
+                    <li><a href="#feature-comparison">Emir: corrected alignment</a></li>
+                </ul>
+            </li>
+            <li class="bookmark-group">
+                <a class="bookmark-heading" href="#bells">Part 5 · Enhancements</a>
+                <ul class="bookmark-children">
+                    <li><a href="#automatic-cropping">Automatic cropping</a></li>
+                    <li><a href="#automatic-contrast">Contrast stretching</a></li>
+                    <li><a href="#white-balance">Gray World white balance</a></li>
+                    <li><a href="#enhancement-comparison">Before &amp; after white balance</a></li>
+                </ul>
+            </li>
+            <li class="bookmark-group">
+                <a class="bookmark-heading" href="#results">Part 6 · All Results</a>
+                <ul class="bookmark-children">
+                    <li><a href="#gallery-small">Small JPEGs · single scale</a></li>
+                    <li><a href="#gallery-tiff">Large TIFFs · image pyramid</a></li>
+                    <li><a href="#extras">Self-selected photographs</a></li>
+                    <li><a href="#baseline-results">NCC &amp; L2 comparison</a></li>
+                </ul>
+            </li>
+            <li class="bookmark-group">
+                <a class="bookmark-heading" href="#conclusion">Conclusion</a>
+            </li>
+        </ul>
+    </nav>
 
     <main>
         <header>
@@ -527,15 +740,9 @@
         <section class="project-section" id="overview">
             <p class="eyebrow">Part 1</p>
             <h2 class="section-title">From Glass Plate to Color</h2>
-            <p class="section-intro">
-                Each scan stores three filtered exposures vertically in B, G, R order.
-                I split the plate into equal thirds, keep blue fixed as the reference,
-                translate green and red, and stack the aligned channels into an RGB image.
-            </p>
-
             <ol class="pipeline">
                 <li><span class="step-number">Step 01</span>Split the plate into blue, green, and red grayscale channels.</li>
-                <li><span class="step-number">Step 02</span>Search candidate x/y translations against the blue reference.</li>
+                <li><span class="step-number">Step 02</span>candidate dx/dy against the blue reference.</li>
                 <li><span class="step-number">Step 03</span>Shift the green and red channels by their best offsets.</li>
                 <li><span class="step-number">Step 04</span>Stack R, G, and B, then crop and enhance the result.</li>
             </ol>
@@ -546,57 +753,40 @@
             <h2 class="section-title">Single-Scale Alignment</h2>
             <p class="section-intro">
                 For the small JPEG scans, I exhaustively search all translations in a
-                $[-15,15]$ pixel window. Only the overlapping interior is scored, and the
-                outer 10% is ignored so that plate borders do not dominate the match.
+                $[-15,15]$ pixel window. I apply an automatic cropping function to remove
+                the image borders and crop corresponding regions using each candidate
+                $(d_x,d_y)$ offset. NCC is then computed on these clean, matching regions.
             </p>
 
             <div class="equation-grid">
-                <article class="metric-card">
+                <article class="metric-card" id="metric-l2">
                     <h3>L2 / Mean Squared Error</h3>
                     <p>Lower values indicate a closer match. My implementation uses the mean squared difference, which is an SSD-style variant of L2.</p>
                     <div class="equation">$\operatorname{MSE}(I,R)=\frac{1}{N}\sum_p(I_p-R_p)^2$</div>
                 </article>
-                <article class="metric-card">
+                <article class="metric-card" id="metric-ncc">
                     <h3>Normalized Cross-Correlation</h3>
                     <p>Higher values indicate a closer match. Mean subtraction makes NCC less sensitive to a global brightness offset.</p>
                     <div class="equation">$\operatorname{NCC}(I,R)=\frac{(I-\bar I)\cdot(R-\bar R)}{\lVert I-\bar I\rVert\lVert R-\bar R\rVert}$</div>
                 </article>
             </div>
 
-            <div class="photo-grid three-up" style="margin-top: 28px;">
-                <figure>
-                    <img loading="lazy" src="./media/cathedral_out.jpg" alt="Single-scale alignment result for cathedral">
-                    <figcaption><span class="photo-name">Cathedral</span><span class="photo-meta">Pixel NCC · G 0.9590 · R 0.9024<br>Pixel L2/MSE · G 0.0209 · R 0.0461<br>G (2, 5) · R (3, 12)</span></figcaption>
-                </figure>
-                <figure>
-                    <img loading="lazy" src="./media/monastery_out.jpg" alt="Single-scale alignment result for monastery">
-                    <figcaption><span class="photo-name">Monastery</span><span class="photo-meta">Pixel NCC · G 0.9412 · R 0.7897<br>Pixel L2/MSE · G 0.0105 · R 0.0389<br>G (2, −3) · R (2, 3)</span></figcaption>
-                </figure>
-                <figure>
-                    <img loading="lazy" src="./media/tobolsk_out.jpg" alt="Single-scale alignment result for Tobolsk">
-                    <figcaption><span class="photo-name">Tobolsk</span><span class="photo-meta">Pixel NCC · G 0.9220 · R 0.8547<br>Pixel L2/MSE · G 0.0120 · R 0.0384<br>G (3, 3) · R (3, 6)</span></figcaption>
-                </figure>
-            </div>
+
         </section>
 
         <section class="project-section" id="pyramid">
             <p class="eyebrow">Part 3</p>
             <h2 class="section-title">Coarse-to-Fine Image Pyramid</h2>
-            <p class="section-intro">
-                A direct large-window search is too expensive for the full-resolution TIFFs.
-                I recursively downsample both channels by a factor of two with anti-aliasing,
-                search ±30 pixels at the coarsest level, double that estimate at each finer
-                level, and refine it within ±5 pixels. The same fixed parameters are used for every image.
-            </p>
 
-            <ol class="pipeline">
+
+            <ol class="pipeline" id="pyramid-process">
                 <li><span class="step-number">Coarsen</span>Downsample until the largest dimension is below 300 pixels.</li>
                 <li><span class="step-number">Search</span>Estimate the displacement on the smallest pair of images.</li>
                 <li><span class="step-number">Propagate</span>Multiply the coarse displacement by two for the next level.</li>
                 <li><span class="step-number">Refine</span>Search a small neighborhood and repeat at full resolution.</li>
             </ol>
 
-            <div class="feature-grid">
+            <div class="feature-grid" id="pyramid-performance">
                 <article class="info-card">
                     <h3>Why it is faster</h3>
                     <p>The broad displacement is found where the images are small. Full-resolution work is limited to a local 11×11 search rather than hundreds of candidate shifts in each direction.</p>
@@ -606,33 +796,184 @@
                     <p>On the collected baseline run, pixel NCC typically took 15–19 seconds per TIFF and pixel L2/MSE took about 8–9 seconds, remaining below the one-minute target.</p>
                 </article>
             </div>
+            <div class="report-subsection" id="pyramid-examples">
+                <h3 class="subsection-title">Four Large-TIFF Examples</h3>
+                <p class="section-intro">Church, Harvesters, Melons, and Icon are large TIFF inputs aligned with the image pyramid. These saved examples use the final Sobel-NCC metric explained in <a href="#features">Part 4</a>.</p>
+                <div class="photo-grid">
+                <figure><img width="3360" height="3020" loading="lazy" src="./media/church_out.jpg" alt="Colorized church"><figcaption><span class="photo-name">Church</span><span class="photo-meta">Sobel NCC · G 0.5757 · R 0.5532<br>G (4, 25) · R (−4, 58)</span></figcaption></figure>
+                <figure><img width="3367" height="3094" loading="lazy" src="./media/harvesters_out.jpg" alt="Colorized harvesters"><figcaption><span class="photo-name">Harvesters</span><span class="photo-meta">Sobel NCC · G 0.3537 · R 0.2978<br>G (17, 60) · R (14, 124)</span></figcaption></figure>
+                <figure><img width="3359" height="3064" loading="lazy" src="./media/melons_out.jpg" alt="Colorized melon stand"><figcaption><span class="photo-name">Melons</span><span class="photo-meta">Sobel NCC · G 0.4506 · R 0.3681<br>G (10, 80) · R (13, 177)</span></figcaption></figure>
+                <figure><img width="3521" height="3058" loading="lazy" src="./media/icon_out.jpg" alt="Colorized icon interior"><figcaption><span class="photo-name">Icon</span><span class="photo-meta">Sobel NCC · G 0.3841 · R 0.3505<br>G (17, 42) · R (23, 90)</span></figcaption></figure>
+                </div>
+            </div>
+
+            <div class="report-subsection" id="emir-failure">
+                <h3 class="subsection-title">Where Pixel Matching Fails: Emir</h3>
+                <p class="section-intro">The red, green, and blue filters record different relative brightnesses in Emir's clothing and surroundings. Raw intensities therefore do not match consistently across channels. The pixel-NCC pyramid selects an incorrect coarse red-channel offset and carries that error into finer levels.</p>
+                <div class="photo-grid comparison-grid">
+                    <figure>
+                        <div class="image-placeholder" role="img" aria-label="Placeholder for the failed raw-pixel alignment of Emir">
+                            <strong>Emir · Failed Pixel Alignment</strong>
+                            <span>Image placeholder<br>Raw-pixel NCC + image pyramid</span>
+                        </div>
+                        <figcaption><span class="photo-name">Pixel NCC · Failure</span><span class="photo-meta">G (24, 49) · R (−547, 443)<br>Failed red-channel alignment</span></figcaption>
+                    </figure>
+                    <figure><img width="3372" height="3056" loading="lazy" src="./media/emir_out.jpg" alt="Colorized Emir of Bukhara"><figcaption><span class="photo-name">Emir</span><span class="photo-meta">Sobel NCC · G 0.4772 · R 0.5118<br>G (24, 49) · R (40, 107)</span></figcaption></figure>
+                </div>
+                <p class="warning-note">The failure is driven by channel-dependent color and brightness differences, not just a large displacement. Matching shared edges with Sobel gradients resolves this case, as detailed in Part 4.</p>
+            </div>
+        </section>
+
+        <section class="project-section" id="features">
+            <p class="eyebrow">Part 4</p>
+            <h2 class="section-title">Gradient-Based Alignment</h2>
+            <p class="section-intro">I replace raw pixel intensities with gradient magnitudes before searching for an alignment. The outlines of Emir's robe, face, and background remain at the same scene locations across the three exposures, even when the materials have very different brightnesses through each color filter. Comparing these shared boundaries gives NCC a more consistent signal.</p>
+
+            <div class="report-subsection" id="gradient-kernels">
+                <h3 class="subsection-title">1. Compute Horizontal and Vertical Sobel Responses</h3>
+                <p class="section-intro">My custom 2D filter slides the following $3\times3$ kernels over each channel. The center row or column receives twice the weight, combining a local intensity difference in one direction with smoothing in the other. Edge padding preserves the image dimensions.</p>
+                <div class="equation-grid">
+                    <article class="metric-card">
+                        <h3>Horizontal response</h3>
+                        <div class="equation">\[\begin{gathered}K_x=\begin{bmatrix}-1&0&1\\-2&0&2\\-1&0&1\end{bmatrix}\\[8pt]G_x=I\star K_x\end{gathered}\]</div>
+                    </article>
+                    <article class="metric-card">
+                        <h3>Vertical response</h3>
+                        <div class="equation">\[\begin{gathered}K_y=\begin{bmatrix}1&2&1\\0&0&0\\-1&-2&-1\end{bmatrix}\\[8pt]G_y=I\star K_y\end{gathered}\]</div>
+                    </article>
+                </div>
+                <p class="analysis-content">Here $\star$ denotes applying the displayed kernel directly to each local neighborhood, as in my filtering implementation. $G_x$ measures left-to-right changes, and $G_y$ measures top-to-bottom changes with the sign convention shown above.</p>
+            </div>
+
+            <div class="report-subsection" id="gradient-magnitude">
+                <h3 class="subsection-title">2. Match Edge Strength Instead of Color Brightness</h3>
+                <p class="section-intro">At each pixel, I combine the two directional responses into one nonnegative edge-strength image for each channel:</p>
+                <div class="equation-card"><div class="equation">\[M_I=\sqrt{G_x^2+G_y^2}\]</div></div>
+                <div class="analysis-content">
+                    <p>The magnitude emphasizes boundaries and discards the sign of the local change. A boundary can therefore remain useful even when it is bright-to-dark in one channel and dark-to-bright in another. Large, nearly uniform regions contribute little edge energy.</p>
+                    <p>Because both Sobel kernels sum to zero, a constant brightness offset disappears. For a global intensity change $J=aI+b$, the magnitudes satisfy $M_J=|a|M_I$; NCC then normalizes this scale difference. Raw-pixel NCC already handles a global gain and offset, but Emir's different materials change brightness differently across color filters. The benefit here is comparing shared structure despite those local color-response differences.</p>
+                </div>
+            </div>
+
+            <div class="report-subsection" id="gradient-matching">
+                <h3 class="subsection-title">3. Run the Pyramid Search on Gradient Magnitudes</h3>
+                <p class="section-intro">At each pyramid level, I compute Sobel magnitudes for the moving channel $C\in\{G,R\}$ and the blue reference $B$. The same automatic cropping function produces clean, corresponding patches for every candidate displacement, and I select the displacement with the highest NCC:</p>
+                <div class="equation-card"><div class="equation">\[\begin{gathered}S(d_x,d_y)=\operatorname{NCC}(P_C,P_B)\\[8pt](d_x^*,d_y^*)=\underset{d_x,d_y}{\operatorname{arg\,max}}\;S(d_x,d_y)\end{gathered}\]</div></div>
+                <p class="analysis-content">Here $P_C$ and $P_B$ are the cropped gradient-magnitude patches for a candidate $(d_x,d_y)$. The coarsest level searches within ±30 pixels; each finer level doubles the previous offset and refines within ±5 pixels. I apply the winning offsets to the original intensity channels and stack them into RGB, so gradients guide the alignment while the output retains the original color information. My implementation also includes Prewitt and Roberts filters; the results below use Sobel.</p>
+            </div>
+
+            <h3 class="subsection-title report-subsection">4. Correcting the Emir Failure</h3>
+            <div class="feature-callout" id="feature-comparison">
+                <figure>
+                    <img width="3372" height="3056" loading="lazy" src="./media/emir_out.jpg" alt="Emir aligned successfully with Sobel gradient NCC">
+                    <figcaption><span class="photo-name">Emir with Sobel NCC</span><span class="photo-meta">G score 0.4772 · R score 0.5118<br>G (24, 49) · R (40, 107)</span></figcaption>
+                </figure>
+                <article class="info-card">
+                    <h3>A decisive failure case</h3>
+                    <p>Green aligns under all methods, but the red exposure is too dissimilar from blue for raw-pixel matching. The pyramid then amplifies an incorrect coarse estimate.</p>
+                    <div class="offset-compare">
+                        <div class="offset-row"><strong>Pixel NCC</strong>G 0.7035 at (24, 49)<br>R 0.3061 at (−547, 443) · failed</div>
+                        <div class="offset-row"><strong>Pixel L2 / MSE</strong>G 0.0245 at (24, 49)<br>R 0.0664 at (−555, −405) · failed</div>
+                        <div class="offset-row"><strong>Sobel NCC</strong>G 0.4772 at (24, 49)<br>R 0.5118 at (40, 107) · aligned</div>
+                    </div>
+                </article>
+            </div>
+
+        </section>
+
+        <section class="project-section" id="bells">
+            <p class="eyebrow">Part 5 · Enhancements</p>
+            <h2 class="section-title">Automatic Finishing</h2>
+            <p class="section-intro">
+                After alignment, I apply three automatic finishing steps: valid-overlap and
+                dark-border cropping, global contrast stretching, and Gray World white balance.
+            </p>
+
+            <div class="feature-grid">
+                <article class="info-card" id="automatic-cropping">
+                    <h3>Automatic Cropping</h3>
+                    <p>First, the G/R offsets define the common valid rectangle, removing wrapped pixels created by <code>np.roll</code>. Sobel row and column profiles then search only the outer 20% for a dark-to-image transition. A brightness check prevents a strong interior edge from being selected solely because of its gradient.</p>
+                </article>
+                <article class="info-card" id="automatic-contrast">
+                    <h3>Automatic Contrast</h3>
+                    <p>One global linear mapping is shared by all RGB channels, preserving their relationship while mapping the darkest value to zero and the brightest to one.</p>
+                    <div class="equation">$I'=\frac{I-I_{\min}}{I_{\max}-I_{\min}}$</div>
+                </article>
+                <article class="info-card" id="white-balance">
+                    <h3>Gray World White Balance</h3>
+                    <p>The average RGB color is assumed to be neutral gray. Each channel receives a multiplicative gain that brings its mean to the shared mean. Statistics are accumulated in float64 to avoid visible error on ten-million-pixel images.</p>
+                </article>
+                <article class="info-card">
+                    <h3>Current Limitation</h3>
+                    <p>The crop detector is designed for dark borders. Bright or strongly colored rims can remain, as visible in several results. This is preferable to aggressively cutting genuine image content.</p>
+                </article>
+            </div>
+
+            <div class="photo-grid" id="enhancement-comparison" style="margin-top: 28px;">
+                <figure><img width="3366" height="3056" loading="lazy" src="./media/Gruppa_out.jpg" alt="Gruppa aligned and automatically cropped"><figcaption><span class="photo-name">Aligned &amp; Cropped</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947<br>Crop + global contrast</span></figcaption></figure>
+                <figure><img width="3366" height="3056" loading="lazy" src="./media/Gruppa_balance_out.jpg" alt="Gruppa after Gray World white balance"><figcaption><span class="photo-name">Gray World Variant</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947<br>Gray World + global contrast</span></figcaption></figure>
+            </div>
         </section>
 
         <section class="project-section" id="results">
-            <p class="eyebrow">Part 4</p>
-            <h2 class="section-title">Full-Resolution Results</h2>
-            <p class="section-intro">
-                The gallery below shows the final Sobel-NCC colorizations. Images are displayed
-                at their original saved resolution; CSS only scales their on-page presentation.
-                Every caption reports the Sobel-NCC score and offset used for that result.
-                The complete pixel-baseline offsets and scores follow the gallery.
-            </p>
+            <p class="eyebrow">Part 6</p>
+            <h2 class="section-title">All Colorized Photographs</h2>
+            <p class="section-intro">The complete collection is organized by input type and alignment method: three small JPEGs, eleven provided large TIFFs, and three self-selected TIFFs. Offsets are reported as $(d_x,d_y)$ relative to blue. The large-input results are displayed as JPEG exports of the aligned TIFF scans.</p>
 
-            <div class="photo-grid">
-                <figure><img loading="lazy" src="./media/church_out.jpg" alt="Colorized church"><figcaption><span class="photo-name">Church</span><span class="photo-meta">Sobel NCC · G 0.5757 · R 0.5532<br>G (4, 25) · R (−4, 58)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/emir_out.jpg" alt="Colorized Emir of Bukhara"><figcaption><span class="photo-name">Emir</span><span class="photo-meta">Sobel NCC · G 0.4772 · R 0.5118<br>G (24, 49) · R (40, 107)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/harvesters_out.jpg" alt="Colorized harvesters"><figcaption><span class="photo-name">Harvesters</span><span class="photo-meta">Sobel NCC · G 0.3537 · R 0.2978<br>G (17, 60) · R (14, 124)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/icon_out.jpg" alt="Colorized icon interior"><figcaption><span class="photo-name">Icon</span><span class="photo-meta">Sobel NCC · G 0.3841 · R 0.3505<br>G (17, 42) · R (23, 90)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/ilemselga_out.jpg" alt="Colorized Ilemselga church"><figcaption><span class="photo-name">Ilemselga</span><span class="photo-meta">Sobel NCC · G 0.6798 · R 0.5823<br>G (7, 40) · R (11, 131)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/melons_out.jpg" alt="Colorized melon stand"><figcaption><span class="photo-name">Melons</span><span class="photo-meta">Sobel NCC · G 0.4506 · R 0.3681<br>G (10, 80) · R (13, 177)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/railroad_out.jpg" alt="Colorized railroad group"><figcaption><span class="photo-name">Railroad</span><span class="photo-meta">Sobel NCC · G 0.6780 · R 0.6240<br>G (−14, 34) · R (−26, 121)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/self_portrait_out.jpg" alt="Colorized self portrait"><figcaption><span class="photo-name">Self Portrait</span><span class="photo-meta">Sobel NCC · G 0.4239 · R 0.3992<br>G (29, 78) · R (37, 176)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/siren_out.jpg" alt="Colorized lilac flowers"><figcaption><span class="photo-name">Siren</span><span class="photo-meta">Sobel NCC · G 0.4343 · R 0.4509<br>G (−6, 49) · R (−24, 96)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/three_generations_out.jpg" alt="Colorized portrait of three generations"><figcaption><span class="photo-name">Three Generations</span><span class="photo-meta">Sobel NCC · G 0.4617 · R 0.4676<br>G (12, 54) · R (9, 111)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/wharf_out.jpg" alt="Colorized wharf"><figcaption><span class="photo-name">Wharf</span><span class="photo-meta">Sobel NCC · G 0.6928 · R 0.5296<br>G (−7, 15) · R (−16, 83)</span></figcaption></figure>
+            <div class="gallery-group" id="gallery-small">
+                <span class="tag">3 small JPEGs · Direct single-scale alignment</span>
+                <h3 class="subsection-title">Small Images: Direct Translation Search</h3>
+                <p class="section-intro">Cathedral, Monastery, and Tobolsk use direct translation search at their original small resolution, without an image pyramid. The captions report the pixel-NCC and L2/MSE baseline scores.</p>
+            <div class="photo-grid three-up" id="single-scale-results" style="margin-top: 28px;">
+                <figure>
+                    <img width="359" height="318" loading="lazy" src="./media/cathedral_out.jpg" alt="Single-scale alignment result for cathedral">
+                    <figcaption><span class="photo-name">Cathedral</span><span class="photo-meta">Pixel NCC · G 0.9590 · R 0.9024<br>Pixel L2/MSE · G 0.0209 · R 0.0461<br>G (2, 5) · R (3, 12)</span></figcaption>
+                </figure>
+                <figure>
+                    <img width="361" height="335" loading="lazy" src="./media/monastery_out.jpg" alt="Single-scale alignment result for monastery">
+                    <figcaption><span class="photo-name">Monastery</span><span class="photo-meta">Pixel NCC · G 0.9412 · R 0.7897<br>Pixel L2/MSE · G 0.0105 · R 0.0389<br>G (2, −3) · R (2, 3)</span></figcaption>
+                </figure>
+                <figure>
+                    <img width="363" height="325" loading="lazy" src="./media/tobolsk_out.jpg" alt="Single-scale alignment result for Tobolsk">
+                    <figcaption><span class="photo-name">Tobolsk</span><span class="photo-meta">Pixel NCC · G 0.9220 · R 0.8547<br>Pixel L2/MSE · G 0.0120 · R 0.0384<br>G (3, 3) · R (3, 6)</span></figcaption>
+                </figure>
+            </div>
             </div>
 
-            <div class="table-wrap" aria-label="Pixel alignment offsets and scores">
+            <div class="gallery-group" id="gallery-tiff">
+                <span class="tag">11 large TIFFs · Image pyramid + Sobel NCC</span>
+                <h3 class="subsection-title">Large Images: Coarse-to-Fine Pyramid Alignment</h3>
+                <p class="section-intro">These are the provided large TIFF photographs. Their displayed results use the pyramid search with Sobel-gradient NCC, followed by cropping and contrast enhancement.</p>
+            <div class="photo-grid" id="result-gallery">
+                <figure><img width="3360" height="3020" loading="lazy" src="./media/church_out.jpg" alt="Colorized church"><figcaption><span class="photo-name">Church</span><span class="photo-meta">Sobel NCC · G 0.5757 · R 0.5532<br>G (4, 25) · R (−4, 58)</span></figcaption></figure>
+                <figure><img width="3372" height="3056" loading="lazy" src="./media/emir_out.jpg" alt="Colorized Emir of Bukhara"><figcaption><span class="photo-name">Emir</span><span class="photo-meta">Sobel NCC · G 0.4772 · R 0.5118<br>G (24, 49) · R (40, 107)</span></figcaption></figure>
+                <figure><img width="3367" height="3094" loading="lazy" src="./media/harvesters_out.jpg" alt="Colorized harvesters"><figcaption><span class="photo-name">Harvesters</span><span class="photo-meta">Sobel NCC · G 0.3537 · R 0.2978<br>G (17, 60) · R (14, 124)</span></figcaption></figure>
+                <figure><img width="3521" height="3058" loading="lazy" src="./media/icon_out.jpg" alt="Colorized icon interior"><figcaption><span class="photo-name">Icon</span><span class="photo-meta">Sobel NCC · G 0.3841 · R 0.3505<br>G (17, 42) · R (23, 90)</span></figcaption></figure>
+                <figure><img width="3363" height="2972" loading="lazy" src="./media/ilemselga_out.jpg" alt="Colorized Ilemselga church"><figcaption><span class="photo-name">Ilemselga</span><span class="photo-meta">Sobel NCC · G 0.6798 · R 0.5823<br>G (7, 40) · R (11, 131)</span></figcaption></figure>
+                <figure><img width="3359" height="3064" loading="lazy" src="./media/melons_out.jpg" alt="Colorized melon stand"><figcaption><span class="photo-name">Melons</span><span class="photo-meta">Sobel NCC · G 0.4506 · R 0.3681<br>G (10, 80) · R (13, 177)</span></figcaption></figure>
+                <figure><img width="3360" height="3095" loading="lazy" src="./media/railroad_out.jpg" alt="Colorized railroad group"><figcaption><span class="photo-name">Railroad</span><span class="photo-meta">Sobel NCC · G 0.6780 · R 0.6240<br>G (−14, 34) · R (−26, 121)</span></figcaption></figure>
+                <figure><img width="3334" height="3014" loading="lazy" src="./media/self_portrait_out.jpg" alt="Colorized self portrait"><figcaption><span class="photo-name">Self Portrait</span><span class="photo-meta">Sobel NCC · G 0.4239 · R 0.3992<br>G (29, 78) · R (37, 176)</span></figcaption></figure>
+                <figure><img width="3405" height="3154" loading="lazy" src="./media/siren_out.jpg" alt="Colorized lilac flowers"><figcaption><span class="photo-name">Siren</span><span class="photo-meta">Sobel NCC · G 0.4343 · R 0.4509<br>G (−6, 49) · R (−24, 96)</span></figcaption></figure>
+                <figure><img width="3379" height="3043" loading="lazy" src="./media/three_generations_out.jpg" alt="Colorized portrait of three generations"><figcaption><span class="photo-name">Three Generations</span><span class="photo-meta">Sobel NCC · G 0.4617 · R 0.4676<br>G (12, 54) · R (9, 111)</span></figcaption></figure>
+                <figure><img width="3360" height="3033" loading="lazy" src="./media/wharf_out.jpg" alt="Colorized wharf"><figcaption><span class="photo-name">Wharf</span><span class="photo-meta">Sobel NCC · G 0.6928 · R 0.5296<br>G (−7, 15) · R (−16, 83)</span></figcaption></figure>
+            </div>
+            </div>
+
+            <div class="gallery-group" id="extras">
+                <span class="tag">3 self-selected TIFFs · Image pyramid + Sobel NCC</span>
+                <h3 class="subsection-title">Self-Selected Photographs</h3>
+                <p class="section-intro">Gruppa, Bearded Men, and Religious Painting are my additional selections from the Prokudin-Gorskii collection. I process them with the same pyramid and Sobel-NCC settings, without image-specific offset tuning. The extra Gray World version of Gruppa is shown in Part 5.</p>
+            <div class="photo-grid three-up" id="extra-gallery">
+                <figure><img width="3366" height="3056" loading="lazy" src="./media/Gruppa_out.jpg" alt="Additional colorized image Gruppa"><figcaption><span class="photo-name">Gruppa</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947<br>G (7, 33) · R (16, 113)</span></figcaption></figure>
+                <figure><img width="3505" height="3006" loading="lazy" src="./media/bearded_men_out.jpg" alt="Additional colorized image of bearded wooden figures"><figcaption><span class="photo-name">Bearded Men</span><span class="photo-meta">Sobel NCC · G 0.5196 · R 0.4139<br>G (13, 54) · R (4, 126)</span></figcaption></figure>
+                <figure><img width="3468" height="2635" loading="lazy" src="./media/religous_painting_out.jpg" alt="Additional colorized image of a religious painting"><figcaption><span class="photo-name">Religious Painting</span><span class="photo-meta">Sobel NCC · G 0.4480 · R 0.4540<br>G (7, 30) · R (6, 70)</span></figcaption></figure>
+            </div>
+            </div>
+
+            <div class="report-subsection" id="baseline-results">
+                <h3 class="subsection-title">Pixel-NCC and L2 Baseline Comparison</h3>
+                <p class="section-intro">This table records the raw-pixel baseline runs. The large-TIFF gallery above instead shows the final Sobel-NCC results, whose offsets and scores appear in each image caption. Failed baseline offsets remain visible for comparison.</p>
+            <div class="table-wrap" id="baseline-comparison" aria-label="Pixel alignment offsets and scores">
                 <table>
                     <thead>
                         <tr><th>Image</th><th>Scale</th><th>NCC G</th><th>NCC R</th><th>NCC score G / R</th><th>L2 G</th><th>L2 R</th><th>MSE G / R</th></tr>
@@ -658,96 +999,9 @@
                     </tbody>
                 </table>
             </div>
-        </section>
-
-        <section class="project-section" id="features">
-            <p class="eyebrow">Part 5 · Better Features</p>
-            <h2 class="section-title">Aligning Edges Instead of Intensities</h2>
-            <p class="section-intro">
-                The same physical surface can have very different values through red, green,
-                and blue filters. This breaks the raw-pixel assumption most clearly on Emir.
-                I implemented 2D convolution and Sobel, Prewitt, and Roberts filters from scratch,
-                then run NCC on gradient magnitude. Structure remains comparable even when color response does not.
-            </p>
-
-            <div class="feature-callout">
-                <figure>
-                    <img loading="lazy" src="./media/emir_out.jpg" alt="Emir aligned successfully with Sobel gradient NCC">
-                    <figcaption><span class="photo-name">Emir with Sobel NCC</span><span class="photo-meta">G score 0.4772 · R score 0.5118<br>G (24, 49) · R (40, 107)</span></figcaption>
-                </figure>
-                <article class="info-card">
-                    <h3>A decisive failure case</h3>
-                    <p>Green aligns under all methods, but the red exposure is too dissimilar from blue for raw-pixel matching. The pyramid then amplifies an incorrect coarse estimate.</p>
-                    <div class="offset-compare">
-                        <div class="offset-row"><strong>Pixel NCC</strong>G 0.7035 at (24, 49)<br>R 0.3061 at (−547, 443) · failed</div>
-                        <div class="offset-row"><strong>Pixel L2 / MSE</strong>G 0.0245 at (24, 49)<br>R 0.0664 at (−555, −405) · failed</div>
-                        <div class="offset-row"><strong>Sobel NCC</strong>G 0.4772 at (24, 49)<br>R 0.5118 at (40, 107) · aligned</div>
-                    </div>
-                </article>
+                <p class="warning-note">On Emir, raw-pixel NCC and L2 both choose incorrect red-channel offsets. On Church, the L2 pyramid repeatedly reaches the edge of its refinement window and ends at (555, 555), while pixel NCC succeeds.</p>
+                <p class="analysis-content">Some color fringes in Harvesters and Three Generations come from people moving between exposures; a single translation cannot correct that motion. The conservative border crop can also leave bright or colored rims.</p>
             </div>
-        </section>
-
-        <section class="project-section" id="extras">
-            <p class="eyebrow">Part 6</p>
-            <h2 class="section-title">Additional Collection Images</h2>
-            <p class="section-intro">
-                I also ran the same fixed-parameter pipeline on additional full-resolution
-                glass plates from the Prokudin-Gorskii collection. No image-specific offset tuning was used.
-            </p>
-
-            <div class="photo-grid three-up">
-                <figure><img loading="lazy" src="./media/Gruppa_out.jpg" alt="Additional colorized image Gruppa"><figcaption><span class="photo-name">Gruppa</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947<br>G (7, 33) · R (16, 113)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/bearded_men_out.jpg" alt="Additional colorized image of bearded wooden figures"><figcaption><span class="photo-name">Bearded Men</span><span class="photo-meta">Sobel NCC · G 0.5196 · R 0.4139<br>G (13, 54) · R (4, 126)</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/religous_painting_out.jpg" alt="Additional colorized image of a religious painting"><figcaption><span class="photo-name">Religious Painting</span><span class="photo-meta">Sobel NCC · G 0.4480 · R 0.4540<br>G (7, 30) · R (6, 70)</span></figcaption></figure>
-            </div>
-        </section>
-
-        <section class="project-section" id="bells">
-            <p class="eyebrow">Part 7 · Bells &amp; Whistles</p>
-            <h2 class="section-title">Automatic Finishing</h2>
-            <p class="section-intro">
-                After alignment, I apply three automatic finishing steps: valid-overlap and
-                dark-border cropping, global contrast stretching, and Gray World white balance.
-            </p>
-
-            <div class="feature-grid">
-                <article class="info-card">
-                    <h3>Automatic Cropping</h3>
-                    <p>First, the G/R offsets define the common valid rectangle, removing wrapped pixels created by <code>np.roll</code>. Sobel row and column profiles then search only the outer 20% for a dark-to-image transition. A brightness check prevents a strong interior edge from being selected solely because of its gradient.</p>
-                </article>
-                <article class="info-card">
-                    <h3>Automatic Contrast</h3>
-                    <p>One global linear mapping is shared by all RGB channels, preserving their relationship while mapping the darkest value to zero and the brightest to one.</p>
-                    <div class="equation">$I'=\frac{I-I_{\min}}{I_{\max}-I_{\min}}$</div>
-                </article>
-                <article class="info-card">
-                    <h3>Gray World White Balance</h3>
-                    <p>The average RGB color is assumed to be neutral gray. Each channel receives a multiplicative gain that brings its mean to the shared mean. Statistics are accumulated in float64 to avoid visible error on ten-million-pixel images.</p>
-                </article>
-                <article class="info-card">
-                    <h3>Current Limitation</h3>
-                    <p>The crop detector is designed for dark borders. Bright or strongly colored rims can remain, as visible in several results. This is preferable to aggressively cutting genuine image content.</p>
-                </article>
-            </div>
-
-            <div class="photo-grid" style="margin-top: 28px;">
-                <figure><img loading="lazy" src="./media/Gruppa_out.jpg" alt="Gruppa aligned and automatically cropped"><figcaption><span class="photo-name">Aligned &amp; Cropped</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947<br>Crop + global contrast</span></figcaption></figure>
-                <figure><img loading="lazy" src="./media/Gruppa_balance_out.jpg" alt="Gruppa after Gray World white balance"><figcaption><span class="photo-name">Gray World Variant</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947<br>Gray World + global contrast</span></figcaption></figure>
-            </div>
-        </section>
-
-        <section class="project-section" id="failures">
-            <p class="eyebrow">Part 8</p>
-            <h2 class="section-title">Failure Analysis</h2>
-            <div class="analysis-content">
-                <p><strong>Emir:</strong> the red and blue intensities differ so strongly that both raw-pixel NCC and L2 choose implausible coarse offsets. Gradient magnitude restores a shared structural representation and produces a clean alignment.</p>
-                <p><strong>Church:</strong> the L2 pyramid repeatedly selects the edge of its local search region, ending at (555, 555). NCC succeeds because normalization is less sensitive to the channel-level brightness difference.</p>
-                <p><strong>Moving subjects:</strong> color fringes around people in Harvesters and Three Generations are not purely registration errors. The three exposures were captured at different moments, so subject motion cannot be corrected by one global translation.</p>
-                <p><strong>Plate borders:</strong> the conservative cropper removes detected black edges and invalid overlap but intentionally leaves uncertain bright or colored bands. A more general border-consistency model would be needed to remove every rim safely.</p>
-            </div>
-            <p class="warning-note" style="margin-top: 28px;">
-                Failed baseline offsets are preserved in the table instead of being manually corrected. They motivate the final Sobel-NCC method and make the comparison reproducible.
-            </p>
         </section>
 
         <section class="project-section" id="conclusion">
@@ -765,5 +1019,83 @@
             CS180 · Intro to Computer Vision and Computational Photography · Project 1
         </footer>
     </main>
+    <script>
+        (() => {
+            const nav = document.querySelector('.bookmark-nav');
+            const toggle = nav.querySelector('.bookmark-toggle');
+            const mobile = window.matchMedia('(max-width: 980px)');
+            const entries = Array.from(nav.querySelectorAll('a[href^="#"]'), link => ({
+                link,
+                target: document.getElementById(link.hash.slice(1))
+            })).filter(entry => entry.target);
+            let activeLink = null;
+            let updatePending = false;
+
+            nav.classList.add('is-enhanced');
+
+            function setMenu(open) {
+                nav.classList.toggle('is-open', open);
+                toggle.setAttribute('aria-expanded', String(open));
+            }
+
+            toggle.addEventListener('click', () => setMenu(!nav.classList.contains('is-open')));
+            nav.addEventListener('click', event => {
+                if (mobile.matches && event.target.closest('a')) {
+                    setMenu(false);
+                    toggle.focus({preventScroll: true});
+                }
+            });
+            nav.addEventListener('keydown', event => {
+                if (event.key === 'Escape' && nav.classList.contains('is-open')) {
+                    setMenu(false);
+                    toggle.focus({preventScroll: true});
+                }
+            });
+
+            function updateCurrentLink() {
+                updatePending = false;
+                const offset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--anchor-offset')) + 12;
+                let current = entries[0];
+                let closestTop = -Infinity;
+
+                for (const entry of entries) {
+                    const top = entry.target.getBoundingClientRect().top;
+                    // Adjacent cards can share a row; prefer the selected anchor in a tie.
+                    if (top <= offset && (top > closestTop + 1 ||
+                        (Math.abs(top - closestTop) <= 1 && entry.link.hash === window.location.hash))) {
+                        current = entry;
+                        closestTop = top;
+                    }
+                }
+                if (window.scrollY > 0 && Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight - 2) {
+                    current = entries[entries.length - 1];
+                }
+                if (current.link === activeLink) return;
+
+                activeLink = current.link;
+                for (const {link} of entries) link.removeAttribute('aria-current');
+                nav.querySelectorAll('.is-current-section').forEach(group => group.classList.remove('is-current-section'));
+                activeLink.setAttribute('aria-current', 'location');
+                activeLink.closest('.bookmark-group').classList.add('is-current-section');
+
+            }
+
+            function scheduleUpdate() {
+                if (updatePending) return;
+                updatePending = true;
+                window.requestAnimationFrame(updateCurrentLink);
+            }
+
+            document.addEventListener('scroll', scheduleUpdate, {passive: true});
+            document.addEventListener('load', scheduleUpdate, true);
+            window.addEventListener('resize', scheduleUpdate);
+            window.addEventListener('hashchange', scheduleUpdate);
+            mobile.addEventListener('change', () => {
+                setMenu(false);
+                scheduleUpdate();
+            });
+            updateCurrentLink();
+        })();
+    </script>
 </body>
 </html>

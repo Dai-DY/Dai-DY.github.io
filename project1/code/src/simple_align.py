@@ -70,4 +70,5 @@ def align_NCC(inpu, reference, center_x=0, center_y=0, max_shift=15):
                 best_offset = (dx, dy)
     dx, dy = best_offset
     best_image = np.roll(inpu, shift=(dy, dx), axis=(0, 1))
+    print(best_score)
     return best_image, best_offset

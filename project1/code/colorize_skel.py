@@ -12,7 +12,7 @@ from src import image_crop
 from src import white_balance
 
 # name of the input file
-imname = 'data/Gruppa.tif'
+imname = 'data/bashkir.tif'
 
 # read in the image as grayscale (the glass plate scan is stacked grayscale)
 im = cv.imread(imname, cv.IMREAD_GRAYSCALE)

@@ -1,0 +1,160 @@
+{
+  "input": "melons.tif",
+  "metric": "pixel NCC",
+  "offset_convention": "(dx, dy): horizontal, vertical; relative to blue; pixels at the current level",
+  "min_size": 300,
+  "alignment_seconds": 17.37983965100011,
+  "preview": "Central 80% of each RGB composite, no contrast or white-balance adjustment; width capped at 960 pixels for the website.",
+  "unaligned": {
+    "file": "melons_unaligned.jpg",
+    "width": 960,
+    "height": 825
+  },
+  "levels": [
+    {
+      "level": 4,
+      "scale_denominator": 16,
+      "width": 236,
+      "height": 202,
+      "search_radius": 30,
+      "candidates_per_channel": 3721,
+      "green_center": [
+        0,
+        0
+      ],
+      "green_offset": [
+        1,
+        5
+      ],
+      "red_center": [
+        0,
+        0
+      ],
+      "red_offset": [
+        1,
+        11
+      ],
+      "image": {
+        "file": "melons_level_4.jpg",
+        "width": 190,
+        "height": 162
+      }
+    },
+    {
+      "level": 3,
+      "scale_denominator": 8,
+      "width": 471,
+      "height": 405,
+      "search_radius": 5,
+      "candidates_per_channel": 121,
+      "green_center": [
+        2,
+        10
+      ],
+      "green_offset": [
+        1,
+        10
+      ],
+      "red_center": [
+        2,
+        22
+      ],
+      "red_offset": [
+        2,
+        22
+      ],
+      "image": {
+        "file": "melons_level_3.jpg",
+        "width": 377,
+        "height": 325
+      }
+    },
+    {
+      "level": 2,
+      "scale_denominator": 4,
+      "width": 942,
+      "height": 810,
+      "search_radius": 5,
+      "candidates_per_channel": 121,
+      "green_center": [
+        2,
+        20
+      ],
+      "green_offset": [
+        3,
+        21
+      ],
+      "red_center": [
+        4,
+        44
+      ],
+      "red_offset": [
+        3,
+        45
+      ],
+      "image": {
+        "file": "melons_level_2.jpg",
+        "width": 754,
+        "height": 648
+      }
+    },
+    {
+      "level": 1,
+      "scale_denominator": 2,
+      "width": 1885,
+      "height": 1620,
+      "search_radius": 5,
+      "candidates_per_channel": 121,
+      "green_center": [
+        6,
+        42
+      ],
+      "green_offset": [
+        5,
+        41
+      ],
+      "red_center": [
+        6,
+        90
+      ],
+      "red_offset": [
+        7,
+        89
+      ],
+      "image": {
+        "file": "melons_level_1.jpg",
+        "width": 960,
+        "height": 824
+      }
+    },
+    {
+      "level": 0,
+      "scale_denominator": 1,
+      "width": 3770,
+      "height": 3241,
+      "search_radius": 5,
+      "candidates_per_channel": 121,
+      "green_center": [
+        10,
+        82
+      ],
+      "green_offset": [
+        11,
+        82
+      ],
+      "red_center": [
+        14,
+        178
+      ],
+      "red_offset": [
+        13,
+        178
+      ],
+      "image": {
+        "file": "melons_level_0.jpg",
+        "width": 960,
+        "height": 825
+      }
+    }
+  ]
+}

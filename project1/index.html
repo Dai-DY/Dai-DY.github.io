@@ -313,6 +313,21 @@
             object-fit: contain;
         }
 
+        #emir-failure .comparison-grid {
+            grid-template-columns: 1fr;
+        }
+
+        #emir-failure .comparison-grid figure {
+            width: min(900px, 85%);
+            justify-self: center;
+        }
+
+        #emir-failure .comparison-grid figure img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: auto;
+        }
+
         .equation-card {
             padding: 24px;
             background: var(--card);
@@ -774,7 +789,7 @@
                     <li><a href="#gallery-small">Small Images: Single Scale</a></li>
                     <li><a href="#gallery-tiff">Large Images: Image Pyramid</a></li>
                     <li><a href="#extras">Self-Selected Photographs</a></li>
-                    <li><a href="#baseline-results">Pixel-NCC Baseline Results</a></li>
+                    <li><a href="#alignment-results">Alignment Results</a></li>
                 </ul>
             </li>
         </ul>
@@ -855,18 +870,18 @@
             <div class="report-subsection" id="single-scale-examples">
                 <h3 class="subsection-title">Single-Scale Alignment Results</h3>
                 <div class="photo-grid three-up">
-                    <figure>
-                        <div class="image-placeholder" role="img" aria-label="Placeholder for the Cathedral single-scale alignment result"><span>Result image placeholder</span></div>
-                        <figcaption><span class="photo-name">Cathedral</span></figcaption>
-                    </figure>
-                    <figure>
-                        <div class="image-placeholder" role="img" aria-label="Placeholder for the Monastery single-scale alignment result"><span>Result image placeholder</span></div>
-                        <figcaption><span class="photo-name">Monastery</span></figcaption>
-                    </figure>
-                    <figure>
-                        <div class="image-placeholder" role="img" aria-label="Placeholder for the Tobolsk single-scale alignment result"><span>Result image placeholder</span></div>
-                        <figcaption><span class="photo-name">Tobolsk</span></figcaption>
-                    </figure>
+                <figure>
+                    <img width="359" height="318" loading="lazy" src="./media/cathedral_out.jpg" alt="Single-scale alignment result for cathedral">
+                    <figcaption><span class="photo-name">Cathedral</span><span class="photo-meta">G (2, 5) · R (3, 12)</span></figcaption>
+                </figure>
+                <figure>
+                    <img width="361" height="335" loading="lazy" src="./media/monastery_out.jpg" alt="Single-scale alignment result for monastery">
+                    <figcaption><span class="photo-name">Monastery</span><span class="photo-meta">G (2, −3) · R (2, 3)</span></figcaption>
+                </figure>
+                <figure>
+                    <img width="363" height="325" loading="lazy" src="./media/tobolsk_out.jpg" alt="Single-scale alignment result for Tobolsk">
+                    <figcaption><span class="photo-name">Tobolsk</span><span class="photo-meta">G (3, 3) · R (3, 6)</span></figcaption>
+                </figure>
                 </div>
             </div>
         </section>
@@ -942,28 +957,46 @@
                 <h3 class="subsection-title">Four Large-TIFF Examples</h3>
                 <p class="section-intro">Church, Harvesters, Melons, and Icon are large TIFF inputs aligned with the image pyramid. These saved examples use the final Sobel-NCC metric explained in Part 4.</p>
                 <div class="photo-grid">
-                <figure><img width="3360" height="3020" loading="lazy" src="./media/church_out.jpg" alt="Colorized church"><figcaption><span class="photo-name">Church</span><span class="photo-meta">Sobel NCC · G 0.5757 · R 0.5532 · G (4, 25) · R (−4, 58)</span></figcaption></figure>
-                <figure><img width="3367" height="3094" loading="lazy" src="./media/harvesters_out.jpg" alt="Colorized harvesters"><figcaption><span class="photo-name">Harvesters</span><span class="photo-meta">Sobel NCC · G 0.3537 · R 0.2978 · G (17, 60) · R (14, 124)</span></figcaption></figure>
-                <figure><img width="3359" height="3064" loading="lazy" src="./media/melons_out.jpg" alt="Colorized melon stand"><figcaption><span class="photo-name">Melons</span><span class="photo-meta">Sobel NCC · G 0.4506 · R 0.3681 · G (10, 80) · R (13, 177)</span></figcaption></figure>
-                <figure><img width="3521" height="3058" loading="lazy" src="./media/icon_out.jpg" alt="Colorized icon interior"><figcaption><span class="photo-name">Icon</span><span class="photo-meta">Sobel NCC · G 0.3841 · R 0.3505 · G (17, 42) · R (23, 90)</span></figcaption></figure>
+                <figure><img width="3634" height="3202" loading="lazy" src="./media/church_pyramid_sobel_out.jpg" alt="Colorized church"><figcaption><span class="photo-name">Church</span><span class="photo-meta">NCC · G 0.5757 · R 0.5532 <br>G (4, 25) · R (−4, 58)</span></figcaption></figure>
+                <figure><img width="3683" height="3218" loading="lazy" src="./media/harvesters_pyramid_sobel_out.jpg" alt="Colorized harvesters"><figcaption><span class="photo-name">Harvesters</span><span class="photo-meta">NCC · G 0.3537 · R 0.2978 <br>G (17, 60) · R (14, 124)</span></figcaption></figure>
+                <figure><img width="3770" height="3241" loading="lazy" src="./media/melons_pyramid_sobel_out.jpg" alt="Colorized melon stand"><figcaption><span class="photo-name">Melons</span><span class="photo-meta">NCC · G 0.4506 · R 0.3681 <br>G (10, 80) · R (13, 177)</span></figcaption></figure>
+                <figure><img width="3741" height="3244" loading="lazy" src="./media/icon_pyramid_sobel_out.jpg" alt="Colorized icon interior"><figcaption><span class="photo-name">Icon</span><span class="photo-meta">NCC · G 0.3841 · R 0.3505 <br>G (17, 42) · R (23, 90)</span></figcaption></figure>
                 </div>
             </div>
 
-            <div class="report-subsection" id="emir-failure">
-                <h3 class="subsection-title">Where Pixel Matching Fails: Emir</h3>
-                <p class="section-intro">The red, green, and blue filters record different relative brightnesses in Emir's clothing and surroundings. Raw intensities therefore do not match consistently across channels. The pixel-NCC pyramid selects an incorrect coarse red-channel offset and carries that error into finer levels.</p>
-                <div class="photo-grid comparison-grid">
-                    <figure>
-                        <div class="image-placeholder" role="img" aria-label="Placeholder for the failed raw-pixel alignment of Emir">
-                            <strong>Emir · Failed Pixel Alignment</strong>
-                            <span>Image placeholder · Raw-pixel NCC + image pyramid</span>
-                        </div>
-                        <figcaption><span class="photo-name">Pixel NCC · Failure</span><span class="photo-meta">G (24, 49) · R (−547, 443) · Failed red-channel alignment</span></figcaption>
-                    </figure>
-                    <figure><img width="3372" height="3056" loading="lazy" src="./media/emir_out.jpg" alt="Colorized Emir of Bukhara"><figcaption><span class="photo-name">Emir</span><span class="photo-meta">Sobel NCC · G 0.4772 · R 0.5118 · G (24, 49) · R (40, 107)</span></figcaption></figure>
-                </div>
-                <p class="warning-note">The failure is driven by channel-dependent color and brightness differences!</p>
+        <div class="report-subsection" id="emir-failure">
+            <h3 class="subsection-title">Where Pixel Matching Fails: Emir</h3>
+
+            <p class="section-intro">
+                The red, green, and blue filters record different relative brightnesses
+                in Emir's clothing and surroundings. Raw intensities therefore do not
+                match consistently across channels. The pixel-NCC pyramid selects an
+                incorrect coarse red-channel offset and carries that error into finer levels.
+            </p>
+
+            <div class="photo-grid comparison-grid">
+                <figure>
+                    <img
+                        width="2948"
+                        height="2720"
+                        loading="lazy"
+                        src="./media/emir_ncc_whitebal_contrast_out.jpg"
+                        alt="Colorized Emir of Bukhara"
+                    >
+
+                    <figcaption>
+                        <span class="photo-name">Pixel NCC · Failure</span>
+                        <span class="photo-meta">
+                            G (24, 49) · R (−547, 443) · Failed red-channel alignment
+                        </span>
+                    </figcaption>
+                </figure>
             </div>
+
+            <p class="warning-note">
+                The failure is driven by channel-dependent color and brightness differences!
+            </p>
+        </div>
         </section>
 
         <section class="project-section" id="features">
@@ -972,7 +1005,7 @@
             <p class="section-intro">I replace raw pixel intensities with gradient magnitudes before searching for an alignment. The outlines of Emir's robe, face, and background remain at the same scene locations across the three exposures, even when the materials have very different brightnesses through each color filter. Comparing these shared boundaries gives NCC a more consistent signal.</p>
 
             <div class="report-subsection" id="gradient-kernels">
-                <h3 class="subsection-title">1. Compute Horizontal and Vertical Sobel Responses</h3>
+                <h3 class="subsection-title">Compute Horizontal and Vertical Sobel Responses</h3>
                 <p class="section-intro">My custom 2D filter slides the following $3\times3$ kernels over each channel. The center row or column receives twice the weight, combining a local intensity difference in one direction with smoothing in the other. Edge padding preserves the image dimensions.</p>
                 <div class="equation-grid">
                     <article class="metric-card">
@@ -988,7 +1021,7 @@
             </div>
 
             <div class="report-subsection" id="gradient-magnitude">
-                <h3 class="subsection-title">2. Match Edge Strength Instead of Color Brightness</h3>
+                <h3 class="subsection-title">Match Edge Strength Instead of Color Brightness</h3>
                 <p class="section-intro">At each pixel, I combine the two directional responses into one nonnegative edge-strength image for each channel:</p>
                 <div class="equation-card"><div class="equation">\[M_I=\sqrt{G_x^2+G_y^2}\]</div></div>
                 <div class="analysis-content">
@@ -998,17 +1031,17 @@
             </div>
 
             <div class="report-subsection" id="gradient-matching">
-                <h3 class="subsection-title">3. Run the Pyramid Search on Gradient Magnitudes</h3>
+                <h3 class="subsection-title">Run the Pyramid Search on Gradient Magnitudes</h3>
                 <p class="section-intro">At each pyramid level, I compute Sobel magnitudes for the moving channel $C\in\{G,R\}$ and the blue reference $B$. The same automatic cropping function produces clean, corresponding patches for every candidate displacement, and I select the displacement with the highest NCC:</p>
                 <div class="equation-card"><div class="equation">\[\begin{gathered}S(d_x,d_y)=\operatorname{NCC}(P_C,P_B)\\[8pt](d_x^*,d_y^*)=\underset{d_x,d_y}{\operatorname{arg\,max}}\;S(d_x,d_y)\end{gathered}\]</div></div>
                 <p class="analysis-content">Here $P_C$ and $P_B$ are the cropped gradient-magnitude patches for a candidate $(d_x,d_y)$. The coarsest level searches within ±30 pixels; each finer level doubles the previous offset and refines within ±5 pixels. I apply the winning offsets to the original intensity channels and stack them into RGB, so gradients guide the alignment while the output retains the original color information. My implementation also includes Prewitt and Roberts filters; the results below use Sobel.</p>
             </div>
 
-            <h3 class="subsection-title report-subsection">4. Correcting the Emir Failure</h3>
+            <h3 class="subsection-title report-subsection">Correcting the Emir Failure</h3>
             <div class="feature-callout" id="feature-comparison">
                 <figure>
                     <img width="3372" height="3056" loading="lazy" src="./media/emir_out.jpg" alt="Emir aligned successfully with Sobel gradient NCC">
-                    <figcaption><span class="photo-name">Emir with Sobel NCC</span><span class="photo-meta">G score 0.4772 · R score 0.5118 · G (24, 49) · R (40, 107)</span></figcaption>
+                    <figcaption><span class="photo-name">Emir with Sobel NCC</span><span class="photo-meta">G score 0.4772 · R score 0.5118 <br>G (24, 49) · R (40, 107)</span></figcaption>
                 </figure>
                 <article class="info-card">
                     <h3>A decisive failure case</h3>
@@ -1049,8 +1082,8 @@
             </div>
 
             <div class="photo-grid" id="enhancement-comparison" style="margin-top: 28px;">
-                <figure><img width="3366" height="3056" loading="lazy" src="./media/Gruppa_out.jpg" alt="Gruppa aligned and automatically cropped"><figcaption><span class="photo-name">Aligned &amp; Cropped</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947 · Crop + global contrast</span></figcaption></figure>
-                <figure><img width="3366" height="3056" loading="lazy" src="./media/Gruppa_balance_out.jpg" alt="Gruppa after Gray World white balance"><figcaption><span class="photo-name">Gray World Variant</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947 · Gray World + global contrast</span></figcaption></figure>
+                <figure><img width="3360" height="3020" loading="lazy" src="./media/church_no_out.jpg" alt="Church aligned and automatically cropped"><figcaption><span class="photo-name">Aligned &amp; Cropped</span><span class="photo-meta">Sobel NCC + Crop</span></figcaption></figure>
+                <figure><img width="3360" height="3020" loading="lazy" src="./media/church_out.jpg" alt="Church after Gray World white balance"><figcaption><span class="photo-name">Gray World Variant</span><span class="photo-meta">Sobel NCC + Gray World + global contrast</span></figcaption></figure>
             </div>
         </section>
 
@@ -1064,15 +1097,15 @@
             <div class="photo-grid three-up" id="single-scale-results" style="margin-top: 28px;">
                 <figure>
                     <img width="359" height="318" loading="lazy" src="./media/cathedral_out.jpg" alt="Single-scale alignment result for cathedral">
-                    <figcaption><span class="photo-name">Cathedral</span><span class="photo-meta">Pixel NCC · G 0.9590 · R 0.9024 · Pixel L2/MSE · G 0.0209 · R 0.0461 · G (2, 5) · R (3, 12)</span></figcaption>
+                    <figcaption><span class="photo-name">Cathedral</span><span class="photo-meta">Pixel NCC · G 0.9590 · R 0.9024 <br>Pixel L2/MSE · G 0.0209 · R 0.0461 <br>G (2, 5) · R (3, 12)</span></figcaption>
                 </figure>
                 <figure>
                     <img width="361" height="335" loading="lazy" src="./media/monastery_out.jpg" alt="Single-scale alignment result for monastery">
-                    <figcaption><span class="photo-name">Monastery</span><span class="photo-meta">Pixel NCC · G 0.9412 · R 0.7897 · Pixel L2/MSE · G 0.0105 · R 0.0389 · G (2, −3) · R (2, 3)</span></figcaption>
+                    <figcaption><span class="photo-name">Monastery</span><span class="photo-meta">Pixel NCC · G 0.9412 · R 0.7897 <br>Pixel L2/MSE · G 0.0105 · R 0.0389 <br>G (2, −3) · R (2, 3)</span></figcaption>
                 </figure>
                 <figure>
                     <img width="363" height="325" loading="lazy" src="./media/tobolsk_out.jpg" alt="Single-scale alignment result for Tobolsk">
-                    <figcaption><span class="photo-name">Tobolsk</span><span class="photo-meta">Pixel NCC · G 0.9220 · R 0.8547 · Pixel L2/MSE · G 0.0120 · R 0.0384 · G (3, 3) · R (3, 6)</span></figcaption>
+                    <figcaption><span class="photo-name">Tobolsk</span><span class="photo-meta">Pixel NCC · G 0.9220 · R 0.8547 <br>Pixel L2/MSE · G 0.0120 · R 0.0384 <br>G (3, 3) · R (3, 6)</span></figcaption>
                 </figure>
             </div>
             </div>
@@ -1081,17 +1114,17 @@
                 <span class="tag">11 large TIFFs · Image pyramid + Sobel NCC</span>
                 <h3 class="subsection-title">Large Images: Coarse-to-Fine Pyramid Alignment</h3>
             <div class="photo-grid" id="result-gallery">
-                <figure><img width="3360" height="3020" loading="lazy" src="./media/church_out.jpg" alt="Colorized church"><figcaption><span class="photo-name">Church</span><span class="photo-meta">Sobel NCC · G 0.5757 · R 0.5532 · G (4, 25) · R (−4, 58)</span></figcaption></figure>
-                <figure><img width="3372" height="3056" loading="lazy" src="./media/emir_out.jpg" alt="Colorized Emir of Bukhara"><figcaption><span class="photo-name">Emir</span><span class="photo-meta">Sobel NCC · G 0.4772 · R 0.5118 · G (24, 49) · R (40, 107)</span></figcaption></figure>
-                <figure><img width="3367" height="3094" loading="lazy" src="./media/harvesters_out.jpg" alt="Colorized harvesters"><figcaption><span class="photo-name">Harvesters</span><span class="photo-meta">Sobel NCC · G 0.3537 · R 0.2978 · G (17, 60) · R (14, 124)</span></figcaption></figure>
-                <figure><img width="3521" height="3058" loading="lazy" src="./media/icon_out.jpg" alt="Colorized icon interior"><figcaption><span class="photo-name">Icon</span><span class="photo-meta">Sobel NCC · G 0.3841 · R 0.3505 · G (17, 42) · R (23, 90)</span></figcaption></figure>
-                <figure><img width="3363" height="2972" loading="lazy" src="./media/ilemselga_out.jpg" alt="Colorized Ilemselga church"><figcaption><span class="photo-name">Ilemselga</span><span class="photo-meta">Sobel NCC · G 0.6798 · R 0.5823 · G (7, 40) · R (11, 131)</span></figcaption></figure>
-                <figure><img width="3359" height="3064" loading="lazy" src="./media/melons_out.jpg" alt="Colorized melon stand"><figcaption><span class="photo-name">Melons</span><span class="photo-meta">Sobel NCC · G 0.4506 · R 0.3681 · G (10, 80) · R (13, 177)</span></figcaption></figure>
-                <figure><img width="3360" height="3095" loading="lazy" src="./media/railroad_out.jpg" alt="Colorized railroad group"><figcaption><span class="photo-name">Railroad</span><span class="photo-meta">Sobel NCC · G 0.6780 · R 0.6240 · G (−14, 34) · R (−26, 121)</span></figcaption></figure>
-                <figure><img width="3334" height="3014" loading="lazy" src="./media/self_portrait_out.jpg" alt="Colorized self portrait"><figcaption><span class="photo-name">Self Portrait</span><span class="photo-meta">Sobel NCC · G 0.4239 · R 0.3992 · G (29, 78) · R (37, 176)</span></figcaption></figure>
-                <figure><img width="3405" height="3154" loading="lazy" src="./media/siren_out.jpg" alt="Colorized lilac flowers"><figcaption><span class="photo-name">Siren</span><span class="photo-meta">Sobel NCC · G 0.4343 · R 0.4509 · G (−6, 49) · R (−24, 96)</span></figcaption></figure>
-                <figure><img width="3379" height="3043" loading="lazy" src="./media/three_generations_out.jpg" alt="Colorized portrait of three generations"><figcaption><span class="photo-name">Three Generations</span><span class="photo-meta">Sobel NCC · G 0.4617 · R 0.4676 · G (12, 54) · R (9, 111)</span></figcaption></figure>
-                <figure><img width="3360" height="3033" loading="lazy" src="./media/wharf_out.jpg" alt="Colorized wharf"><figcaption><span class="photo-name">Wharf</span><span class="photo-meta">Sobel NCC · G 0.6928 · R 0.5296 · G (−7, 15) · R (−16, 83)</span></figcaption></figure>
+                <figure><img width="3360" height="3020" loading="lazy" src="./media/church_out.jpg" alt="Colorized church"><figcaption><span class="photo-name">Church</span><span class="photo-meta">Sobel NCC · G 0.5757 · R 0.5532 <br>G (4, 25) · R (−4, 58)</span></figcaption></figure>
+                <figure><img width="3372" height="3056" loading="lazy" src="./media/emir_out.jpg" alt="Colorized Emir of Bukhara"><figcaption><span class="photo-name">Emir</span><span class="photo-meta">Sobel NCC · G 0.4772 · R 0.5118 <br>G (24, 49) · R (40, 107)</span></figcaption></figure>
+                <figure><img width="3367" height="3094" loading="lazy" src="./media/harvesters_out.jpg" alt="Colorized harvesters"><figcaption><span class="photo-name">Harvesters</span><span class="photo-meta">Sobel NCC · G 0.3537 · R 0.2978 <br>G (17, 60) · R (14, 124)</span></figcaption></figure>
+                <figure><img width="3521" height="3058" loading="lazy" src="./media/icon_out.jpg" alt="Colorized icon interior"><figcaption><span class="photo-name">Icon</span><span class="photo-meta">Sobel NCC · G 0.3841 · R 0.3505 <br>G (17, 42) · R (23, 90)</span></figcaption></figure>
+                <figure><img width="3363" height="2972" loading="lazy" src="./media/ilemselga_out.jpg" alt="Colorized Ilemselga church"><figcaption><span class="photo-name">Ilemselga</span><span class="photo-meta">Sobel NCC · G 0.6798 · R 0.5823 <br>G (7, 40) · R (11, 131)</span></figcaption></figure>
+                <figure><img width="3359" height="3064" loading="lazy" src="./media/melons_out.jpg" alt="Colorized melon stand"><figcaption><span class="photo-name">Melons</span><span class="photo-meta">Sobel NCC · G 0.4506 · R 0.3681 <br>G(10, 80) · R (13, 177)</span></figcaption></figure>
+                <figure><img width="3468" height="2635" loading="lazy" src="./media/religous_painting_out.jpg" alt="Colorized image of a religious painting"><figcaption><span class="photo-name">Religious Painting</span><span class="photo-meta">Sobel NCC · G 0.4480 · R 0.4540 <br>G (7, 30) · R (6, 70)</span></figcaption></figure>
+                <figure><img width="3334" height="3014" loading="lazy" src="./media/self_portrait_out.jpg" alt="Colorized self portrait"><figcaption><span class="photo-name">Self Portrait</span><span class="photo-meta">Sobel NCC · G 0.4239 · R 0.3992 <br>G (29, 78) · R (37, 176)</span></figcaption></figure>
+                <figure><img width="3405" height="3154" loading="lazy" src="./media/siren_out.jpg" alt="Colorized lilac flowers"><figcaption><span class="photo-name">Siren</span><span class="photo-meta">Sobel NCC · G 0.4343 · R 0.4509 <br>G (−6, 49) · R (−24, 96)</span></figcaption></figure>
+                <figure><img width="3379" height="3043" loading="lazy" src="./media/three_generations_out.jpg" alt="Colorized portrait of three generations"><figcaption><span class="photo-name">Three Generations</span><span class="photo-meta">Sobel NCC · G 0.4617 · R 0.4676 <br>G (12, 54) · R (9, 111)</span></figcaption></figure>
+                <figure><img width="3360" height="3033" loading="lazy" src="./media/wharf_out.jpg" alt="Colorized wharf"><figcaption><span class="photo-name">Wharf</span><span class="photo-meta">Sobel NCC · G 0.6928 · R 0.5296 <br>G (−7, 15) · R (−16, 83)</span></figcaption></figure>
             </div>
             </div>
 
@@ -1099,43 +1132,45 @@
                 <span class="tag">3 self-selected TIFFs · Image pyramid + Sobel NCC</span>
                 <h3 class="subsection-title">Self-Selected Photographs</h3>
             <div class="photo-grid three-up" id="extra-gallery">
-                <figure><img width="3366" height="3056" loading="lazy" src="./media/Gruppa_out.jpg" alt="Additional colorized image Gruppa"><figcaption><span class="photo-name">Gruppa</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947 · G (7, 33) · R (16, 113)</span></figcaption></figure>
-                <figure><img width="3505" height="3006" loading="lazy" src="./media/bearded_men_out.jpg" alt="Additional colorized image of bearded wooden figures"><figcaption><span class="photo-name">Bearded Men</span><span class="photo-meta">Sobel NCC · G 0.5196 · R 0.4139 · G (13, 54) · R (4, 126)</span></figcaption></figure>
-                <figure><img width="3468" height="2635" loading="lazy" src="./media/religous_painting_out.jpg" alt="Additional colorized image of a religious painting"><figcaption><span class="photo-name">Religious Painting</span><span class="photo-meta">Sobel NCC · G 0.4480 · R 0.4540 · G (7, 30) · R (6, 70)</span></figcaption></figure>
+                <figure><img width="3360" height="3095" loading="lazy" src="./media/railroad_out.jpg" alt="Additional colorized image railroad group"><figcaption><span class="photo-name">Railroad</span><span class="photo-meta">Sobel NCC · G 0.6780 · R 0.6240 <br>G (−14, 34) · R (−26, 121)</span></figcaption></figure>
+                <figure><img width="3505" height="3006" loading="lazy" src="./media/bearded_men_out.jpg" alt="Additional colorized image of bearded wooden figures"><figcaption><span class="photo-name">Bearded Men</span><span class="photo-meta">Sobel NCC · G 0.5196 · R 0.4139 <br>G (13, 54) · R (4, 126)</span></figcaption></figure>
+                <figure><img width="3366" height="3056" loading="lazy" src="./media/Gruppa_out.jpg" alt="Additional colorized image Gruppa"><figcaption><span class="photo-name">Gruppa</span><span class="photo-meta">Sobel NCC · G 0.5820 · R 0.4947 <br>G (7, 33) · R (16, 113)</span></figcaption></figure>
             </div>
             </div>
 
-            <div class="report-subsection" id="baseline-results">
-                <h3 class="subsection-title">Pixel-NCC Baseline Results</h3>
-                <p class="section-intro">This table reports raw-pixel NCC offsets and similarity scores. G and R offsets are measured relative to the blue channel and written as $(d_x,d_y)$. The large-TIFF gallery uses Sobel-NCC, so its offsets and scores can differ from this baseline.</p>
-            <div class="table-wrap" id="baseline-comparison" aria-label="Pixel-NCC offsets and scores">
-                <table>
-                    <thead>
-                        <tr><th>Image</th><th>Scale</th><th>G offset</th><th>R offset</th><th>NCC score G / R</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>Gruppa</td><td>Pyramid</td><td>(8, 33)</td><td>(15, 113)</td><td>0.8282 / 0.8516</td></tr>
-                        <tr><td>Bearded Men</td><td>Pyramid</td><td>(13, 55)</td><td>(4, 126)</td><td>0.9508 / 0.8482</td></tr>
-                        <tr><td>Cathedral</td><td>Single</td><td>(2, 5)</td><td>(3, 12)</td><td>0.9590 / 0.9024</td></tr>
-                        <tr><td>Church</td><td>Pyramid</td><td>(4, 25)</td><td>(−4, 58)</td><td>0.9088 / 0.7570</td></tr>
-                        <tr><td>Emir</td><td>Pyramid</td><td>(24, 49)</td><td class="failed">(−547, 443)</td><td>0.7035 / 0.3061</td></tr>
-                        <tr><td>Harvesters</td><td>Pyramid</td><td>(17, 60)</td><td>(13, 124)</td><td>0.7777 / 0.7777</td></tr>
-                        <tr><td>Icon</td><td>Pyramid</td><td>(17, 41)</td><td>(23, 89)</td><td>0.8027 / 0.6472</td></tr>
-                        <tr><td>Ilemselga</td><td>Pyramid</td><td>(7, 40)</td><td>(11, 130)</td><td>0.7559 / 0.6443</td></tr>
-                        <tr><td>Melons</td><td>Pyramid</td><td>(11, 82)</td><td>(13, 178)</td><td>0.9370 / 0.9066</td></tr>
-                        <tr><td>Monastery</td><td>Single</td><td>(2, −3)</td><td>(2, 3)</td><td>0.9412 / 0.7897</td></tr>
-                        <tr><td>Railroad</td><td>Pyramid</td><td>(−14, 34)</td><td>(−25, 121)</td><td>0.9385 / 0.8399</td></tr>
-                        <tr><td>Religious Painting</td><td>Pyramid</td><td>(3, 28)</td><td>(7, 68)</td><td>0.8400 / 0.7924</td></tr>
-                        <tr><td>Self Portrait</td><td>Pyramid</td><td>(29, 79)</td><td>(37, 176)</td><td>0.7700 / 0.7237</td></tr>
-                        <tr><td>Siren</td><td>Pyramid</td><td>(−6, 49)</td><td>(−25, 96)</td><td>0.8410 / 0.8849</td></tr>
-                        <tr><td>Three Generations</td><td>Pyramid</td><td>(14, 53)</td><td>(11, 112)</td><td>0.9277 / 0.8876</td></tr>
-                        <tr><td>Tobolsk</td><td>Single</td><td>(3, 3)</td><td>(3, 6)</td><td>0.9220 / 0.8547</td></tr>
-                        <tr><td>Wharf</td><td>Pyramid</td><td>(−7, 15)</td><td>(−16, 83)</td><td>0.8978 / 0.7617</td></tr>
-                    </tbody>
-                </table>
-            </div>
-                <p class="warning-note">On Emir, raw-pixel NCC selects an incorrect red-channel offset of (−547, 443), with a score of 0.3061. The failed offset is highlighted in the table.</p>
-                <p class="analysis-content">Some color fringes in Harvesters and Three Generations come from people moving between exposures; a single translation cannot correct that motion. The conservative border crop can also leave bright or colored rims.</p>
+            <div class="report-subsection" id="alignment-results">
+                <h3 class="subsection-title">Alignment Results</h3>
+                <div class="table-wrap" id="alignment-comparison" aria-label="Final alignment methods, offsets, and NCC scores">
+                    <table>
+                        <thead>
+                            <tr><th>Image</th><th>Method</th><th>G offset</th><th>R offset</th><th>NCC score G / R</th></tr>
+                        </thead>
+                        <tbody>
+                            <!-- Small JPEG images: direct single-scale pixel NCC -->
+                            <tr><td>Cathedral</td><td>Pixel NCC · Single-scale</td><td>(2, 5)</td><td>(3, 12)</td><td>0.9590 / 0.9024</td></tr>
+                            <tr><td>Monastery</td><td>Pixel NCC · Single-scale</td><td>(2, −3)</td><td>(2, 3)</td><td>0.9412 / 0.7897</td></tr>
+                            <tr><td>Tobolsk</td><td>Pixel NCC · Single-scale</td><td>(3, 3)</td><td>(3, 6)</td><td>0.9220 / 0.8547</td></tr>
+
+                            <!-- Large TIFF images: coarse-to-fine pyramid + Sobel-gradient NCC -->
+                            <tr><td>Church</td><td>Sobel NCC · Pyramid</td><td>(4, 25)</td><td>(−4, 58)</td><td>0.5757 / 0.5532</td></tr>
+                            <tr><td>Emir</td><td>Sobel NCC · Pyramid</td><td>(24, 49)</td><td>(40, 107)</td><td>0.4772 / 0.5118</td></tr>
+                            <tr><td>Harvesters</td><td>Sobel NCC · Pyramid</td><td>(17, 60)</td><td>(14, 124)</td><td>0.3537 / 0.2978</td></tr>
+                            <tr><td>Icon</td><td>Sobel NCC · Pyramid</td><td>(17, 42)</td><td>(23, 90)</td><td>0.3841 / 0.3505</td></tr>
+                            <tr><td>Ilemselga</td><td>Sobel NCC · Pyramid</td><td>(7, 40)</td><td>(11, 131)</td><td>0.6798 / 0.5823</td></tr>
+                            <tr><td>Melons</td><td>Sobel NCC · Pyramid</td><td>(10, 80)</td><td>(13, 177)</td><td>0.4506 / 0.3681</td></tr>
+                            <tr><td>Railroad</td><td>Sobel NCC · Pyramid</td><td>(−14, 34)</td><td>(−26, 121)</td><td>0.6780 / 0.6240</td></tr>
+                            <tr><td>Self Portrait</td><td>Sobel NCC · Pyramid</td><td>(29, 78)</td><td>(37, 176)</td><td>0.4239 / 0.3992</td></tr>
+                            <tr><td>Siren</td><td>Sobel NCC · Pyramid</td><td>(−6, 49)</td><td>(−24, 96)</td><td>0.4343 / 0.4509</td></tr>
+                            <tr><td>Three Generations</td><td>Sobel NCC · Pyramid</td><td>(12, 54)</td><td>(9, 111)</td><td>0.4617 / 0.4676</td></tr>
+                            <tr><td>Wharf</td><td>Sobel NCC · Pyramid</td><td>(−7, 15)</td><td>(−16, 83)</td><td>0.6928 / 0.5296</td></tr>
+
+                            <!-- Self-selected TIFF images: pyramid + Sobel-gradient NCC -->
+                            <tr><td>Gruppa</td><td>Sobel NCC · Pyramid</td><td>(7, 33)</td><td>(16, 113)</td><td>0.5820 / 0.4947</td></tr>
+                            <tr><td>Bearded Men</td><td>Sobel NCC · Pyramid</td><td>(13, 54)</td><td>(4, 126)</td><td>0.5196 / 0.4139</td></tr>
+                            <tr><td>Religious Painting</td><td>Sobel NCC · Pyramid</td><td>(7, 30)</td><td>(6, 70)</td><td>0.4480 / 0.4540</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 

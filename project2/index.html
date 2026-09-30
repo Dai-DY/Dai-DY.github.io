@@ -347,6 +347,123 @@
             .bookmark-nav a { transition: none; }
             .hybrid-resizable { transition: none; }
         }
+
+        /* Keep the document stable when it is printed or saved as a PDF. */
+        @page { margin: 12mm; }
+        @media print {
+            :root {
+                --paper: #fff;
+                --card: #fff;
+                --content-gap: 0;
+                --page-gutter: 0;
+            }
+
+            html { scroll-behavior: auto; }
+            body {
+                background: #fff;
+                font-size: 9.5pt;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Fixed/sticky navigation is otherwise repeated over every page. */
+            .page-top,
+            .bookmark-nav,
+            .hybrid-size-control { display: none !important; }
+
+            main {
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                overflow: visible;
+            }
+
+            header { padding: 0 0 10mm; }
+            h1 { font-size: 30pt; }
+            .project-section { padding-bottom: 12mm; }
+            .subsection { margin-top: 8mm; }
+            .section-title { font-size: 21pt; }
+            .subsection-title { font-size: 15pt; }
+            .section-intro,
+            .analysis-text { font-size: 9.5pt; line-height: 1.55; }
+
+            h1, h2, h3, h4,
+            .eyebrow,
+            .tag { break-after: avoid-page; page-break-after: avoid; }
+            p, li { orphans: 3; widows: 3; }
+
+            /* Restore the intended desktop grids regardless of print viewport width. */
+            .photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4mm; align-items: start; }
+            .photo-grid.single-up { grid-template-columns: minmax(0, 1fr); max-width: 120mm; }
+            .photo-grid.three-up { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .photo-grid.four-up { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .card-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3mm; }
+            .code-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4mm; }
+            .hybrid-component-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3mm; align-items: start; }
+            .hybrid-result-grid { grid-template-columns: minmax(0, 1.7fr) minmax(52mm, 1fr); gap: 4mm; align-items: start; }
+            .hybrid-color-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3mm; align-items: start; }
+
+            figure,
+            .info-card,
+            .analysis-prompt,
+            .analysis-text,
+            .table-wrap {
+                break-inside: avoid-page;
+                page-break-inside: avoid;
+            }
+            figure,
+            .info-card,
+            .source-code,
+            .stack-board,
+            .table-wrap { box-shadow: none; }
+            figure { border-radius: 3mm; }
+            figure img,
+            .hybrid-filter-frame img {
+                display: block;
+                max-width: 100%;
+                height: auto;
+            }
+            figcaption {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 2mm;
+                padding: 3mm;
+            }
+            .photo-name { font-size: 8.5pt; }
+            .photo-meta { font-size: 7pt; text-align: right; }
+
+            .hybrid-viewport { padding: 6mm; }
+            .hybrid-scale-pair {
+                height: 72mm;
+                grid-template-columns: minmax(0, 1fr) minmax(14mm, 0.34fr);
+                gap: 2mm;
+                padding: 3mm;
+            }
+            .hybrid-spectrum-image-wrap { min-height: 70mm; }
+
+            .source-code {
+                min-height: 0;
+                padding: 3mm;
+                overflow: visible;
+                border-radius: 3mm;
+                font-size: 6.5pt;
+                line-height: 1.45;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+            }
+            .stack-board { padding: 3mm; overflow: visible; }
+            .stack-level-header,
+            .stack-row {
+                min-width: 0;
+                grid-template-columns: 24mm repeat(6, minmax(0, 1fr));
+                gap: 1.5mm;
+            }
+            .table-wrap { overflow: visible; }
+            table { table-layout: fixed; font-size: 7.5pt; }
+            th, td { padding: 2mm; overflow-wrap: anywhere; }
+            footer { padding: 2mm 0 0; }
+        }
     </style>
 </head>
 <body>
@@ -364,6 +481,7 @@
             <li class="bookmark-group"><a class="bookmark-heading" href="#part-2-2">Part 2.2 · Hybrid Images</a></li>
             <li class="bookmark-group"><a class="bookmark-heading" href="#part-2-3">Part 2.3 · Gaussian &amp; Laplacian Stacks</a></li>
             <li class="bookmark-group"><a class="bookmark-heading" href="#part-2-4">Part 2.4 · Multiresolution Blending</a></li>
+            <li class="bookmark-group"><a class="bookmark-heading" href="#reflection">The Most Important Thing I Learned</a></li>
         </ul>
     </nav>
 
@@ -932,6 +1050,15 @@
                 <div class="analysis-text">
                     <p>This example also uses an irregular mask that follows the subject's silhouette. To align the train and place it at a specific location in the scene, I first created a new canvas with the same dimensions as the galaxy image. I then rotated, scaled, and translated the train on this canvas until its angle and position matched the bright galactic band. The mask was extracted from this transformed image, ensuring that its outline aligned pixel-for-pixel with the final train placement rather than with the original, untransformed photograph. Compared with the Hot Banana example, the selected region occupies a larger portion of the image and contains much richer edge and texture information, so the train contributes visibly across more Laplacian levels. The larger base $\sigma=3$ also produces a broader low-frequency transition, helping reconcile the train's terrestrial lighting with the blue and magenta tones of the galaxy. In the final result, the train's mechanical details remain sharp, while its outer edges pick up some of the surrounding starlight and color. This subtle color transfer makes the train feel embedded in the galaxy rather than pasted on top of it, and the bright galactic band beneath it provides a convincing visual surface for the train to follow.</p>
                 </div>
+            </div>
+        </section>
+
+        <section class="project-section" id="reflection">
+            <p class="eyebrow">Reflection</p>
+            <h2 class="section-title">The Most Important Thing I Learned</h2>
+            <div class="analysis-text">
+                <p>Through implementing the filters in this project, I learned that an image contains far more structure than what is immediately visible in the spatial domain. Some operations that seem difficult when working directly with pixels become much more intuitive after a Fourier transform reveals the image's frequency components. By manipulating these components with relatively simple filters, we can control broad shapes, fine details, sharpness, and even which subject is perceived at different viewing distances.</p>
+                <p style="margin-top:12px;">I also learned that a successful result depends on more than the filtering algorithm itself. Parameter selection is strongly connected to visual perception: values such as sigma, cutoff frequency, and sharpening strength must be evaluated by how the resulting image actually looks. Careful preparation is equally important. Choosing compatible source images, accurately aligning their key features, and constructing an appropriate mask can make the later processing much easier and the final result much more convincing. Overall, this project showed me that effective image processing combines mathematical tools with visual judgment and thoughtful input selection.</p>
             </div>
         </section>
 

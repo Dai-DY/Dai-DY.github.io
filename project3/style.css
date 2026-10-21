@@ -105,7 +105,7 @@ footer { border-top: 1px solid var(--line); padding: 24px 0 54px; color: var(--m
 .lightbox-toolbar p { margin: 0; font-size: .85rem; line-height: 1.5; }
 .lightbox img { display: block; width: 100%; height: auto; }
 @media (min-width: 1650px) { .page-top, main { margin-inline: auto; } }
-@media (max-width: 1100px) {
+@media screen and (max-width: 1100px) {
   :root { --anchor-offset: 76px; }
   .page-top, main { width: calc(100% - 40px); margin-inline: auto; }
   .page-top { padding: 14px 0; }
@@ -118,7 +118,7 @@ footer { border-top: 1px solid var(--line); padding: 24px 0 54px; color: var(--m
   .bookmark-nav.is-open .bookmark-list { display: grid; max-height: calc(100dvh - 70px); overflow-y: auto; }
   header { padding-top: 30px; }
 }
-@media (max-width: 680px) {
+@media screen and (max-width: 680px) {
   .page-top, main { width: calc(100% - 28px); }
   .bookmark-nav { padding-inline: 14px; }
   .bookmark-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
@@ -141,6 +141,10 @@ footer { border-top: 1px solid var(--line); padding: 24px 0 54px; color: var(--m
   h1 { font-size: 36pt; }
   .subsection { margin-top: 24px; }
   figure, .settings, .network, .placeholder { break-inside: avoid; box-shadow: none; }
+  .photo-grid { gap: 4mm; }
+  /* Physical limits keep photos compact and responsive to print scaling. */
+  figure img:not(.distant) { width: auto; height: auto; max-width: min(100%, 160mm); max-height: 70mm; margin-inline: auto; object-fit: contain; }
+  .portrait { max-width: 70mm; }
   h2, h3, h4 { break-after: avoid; }
   .part-heading { break-before: page; }
   details > :not(summary) { display: block !important; }

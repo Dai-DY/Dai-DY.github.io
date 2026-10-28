@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="CS180 Project 4 Part A: manually selected correspondences, homographies, image rectification, inverse warping, and photo mosaics." name="description"/>
+<title>Project 4 | Image Warping &amp; Mosaicing</title>
+<script>window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}};</script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+<link href="./style.css" rel="stylesheet"/>
+<script defer="" src="./script.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="page-top"><a class="back-link" href="../">← Back to portfolio</a></div>
+<nav aria-label="Project contents" class="bookmark-nav">
+<button aria-controls="project-contents" aria-expanded="false" class="bookmark-toggle" type="button">Project 4 · Contents</button>
+<ul class="bookmark-list" id="project-contents">
+<li class="bookmark-group">
+<a class="bookmark-heading" href="#part-a">PART A · WARPING &amp; MOSAICING</a>
+<a href="#a1">A.1 Shoot the pictures</a>
+<a href="#a2">A.2 Recover homographies</a>
+<a href="#correspondences">Manual correspondences</a>
+<a href="#a3">A.3 Inverse warping</a>
+<a href="#rect-monitor">Rectification · Monitor</a>
+<a href="#rect-book">Rectification · Book</a>
+<a href="#rect-bottle">Rectification · Bottle</a>
+<a href="#interpolation">Interpolation comparison</a>
+<a href="#a4">A.4 Blend into a mosaic</a>
+<a href="#mosaic-one">Mosaic 01 · Neighborhood</a>
+<a href="#mosaic-two">Mosaic 02 · Gateway</a>
+<a href="#mosaic-three">Mosaic 03 · Frontview</a>
+<a href="#reflection">What I learned</a>
+</li>
+</ul>
+</nav>
+<main id="main-content">
+<header>
+<p class="eyebrow">CS180 · Computational Photography · Project 4</p>
+<h1>Image Warping &amp; Mosaicing</h1>
+<figure class="hero-figure">
+<a data-enlarge="" href="./media/mosaic/outside11-panorama.webp"><img alt="Eleven-image panorama of my neighborhood" fetchpriority="high" height="1319" src="./media/mosaic/outside11-panorama.webp" width="2800"/></a>
+</figure>
+</header>
+<section class="part" id="part-a">
+<div class="part-heading"><p class="eyebrow">Part A</p></div>
+<section class="subsection" id="a1">
+<h3 class="subsection-title"><span class="section-number">A.1</span>Shoot the Pictures</h3>
+<p>I took these photographs with the camera on my Huawei Pura 70 phone. For each set, I stayed in one fixed position and rotated the phone horizontally in a single direction to capture different viewing angles. The three scenes are my neighborhood, the Gateway teaching building, and the view over University Avenue from the rooftop of my apartment building.</p>
+<h4>Set 01 · The neighborhood</h4>
+<div class="photo-grid three-up">
+<figure><a data-enlarge="" href="./media/sources/outside1.webp"><img alt="First outdoor photograph, looking left along the residential street" decoding="async" height="900" loading="lazy" src="./media/sources/outside1.webp" width="1200"/></a><figcaption><span class="photo-name">Left</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside6.webp"><img alt="Sixth outdoor photograph with a solar roof and church towers, used as the initial reference" decoding="async" height="900" loading="lazy" src="./media/sources/outside6.webp" width="1200"/></a><figcaption><span class="photo-name">Center reference</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside11.webp"><img alt="Last outdoor photograph, looking right toward church towers and a tall evergreen" decoding="async" height="900" loading="lazy" src="./media/sources/outside11.webp" width="1200"/></a><figcaption><span class="photo-name">Right</span></figcaption></figure>
+</div>
+<details><summary>View the remaining eight source photographs</summary><div class="photo-grid source-gallery">
+<figure><a data-enlarge="" href="./media/sources/outside2.webp"><img alt="Outdoor panorama source photograph 2 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside2.webp" width="1200"/></a><figcaption><span class="photo-name">outside2.jpeg</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside3.webp"><img alt="Outdoor panorama source photograph 3 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside3.webp" width="1200"/></a><figcaption><span class="photo-name">outside3.jpeg</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside4.webp"><img alt="Outdoor panorama source photograph 4 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside4.webp" width="1200"/></a><figcaption><span class="photo-name">outside4.jpeg</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside5.webp"><img alt="Outdoor panorama source photograph 5 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside5.webp" width="1200"/></a><figcaption><span class="photo-name">outside5.jpeg</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside7.webp"><img alt="Outdoor panorama source photograph 7 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside7.webp" width="1200"/></a><figcaption><span class="photo-name">outside7.jpeg</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside8.webp"><img alt="Outdoor panorama source photograph 8 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside8.webp" width="1200"/></a><figcaption><span class="photo-name">outside8.jpeg</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside9.webp"><img alt="Outdoor panorama source photograph 9 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside9.webp" width="1200"/></a><figcaption><span class="photo-name">outside9.jpeg</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/sources/outside10.webp"><img alt="Outdoor panorama source photograph 10 of 11" decoding="async" height="900" loading="lazy" src="./media/sources/outside10.webp" width="1200"/></a><figcaption><span class="photo-name">outside10.jpeg</span></figcaption></figure>
+</div></details>
+<h4>Set 02 · Gateway</h4><div class="photo-grid three-up"><figure><a data-enlarge="" href="./media/sources/gateway1.webp"><img alt="gateway panorama source photograph 1" decoding="async" height="900" loading="lazy" src="./media/sources/gateway1.webp" width="1200"/></a><figcaption><span class="photo-name">Left</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/gateway2.webp"><img alt="gateway panorama source photograph 2" decoding="async" height="900" loading="lazy" src="./media/sources/gateway2.webp" width="1200"/></a><figcaption><span class="photo-name">Center reference</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/gateway3.webp"><img alt="gateway panorama source photograph 3" decoding="async" height="900" loading="lazy" src="./media/sources/gateway3.webp" width="1200"/></a><figcaption><span class="photo-name">Right</span></figcaption></figure></div><h4>Set 03 · University Avenue</h4><div class="photo-grid three-up"><figure><a data-enlarge="" href="./media/sources/frontview1.webp"><img alt="frontview panorama source photograph 1" decoding="async" height="900" loading="lazy" src="./media/sources/frontview1.webp" width="1200"/></a><figcaption><span class="photo-name">Left</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview6.webp"><img alt="frontview panorama source photograph 6" decoding="async" height="900" loading="lazy" src="./media/sources/frontview6.webp" width="1200"/></a><figcaption><span class="photo-name">Center reference</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview11.webp"><img alt="frontview panorama source photograph 11" decoding="async" height="900" loading="lazy" src="./media/sources/frontview11.webp" width="1200"/></a><figcaption><span class="photo-name">Right</span></figcaption></figure></div><details><summary>View the other eight Frontview source photographs</summary><div class="photo-grid source-gallery"><figure><a data-enlarge="" href="./media/sources/frontview2.webp"><img alt="frontview panorama source photograph 2" decoding="async" height="900" loading="lazy" src="./media/sources/frontview2.webp" width="1200"/></a><figcaption><span class="photo-name">frontview2.jpeg</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview3.webp"><img alt="frontview panorama source photograph 3" decoding="async" height="900" loading="lazy" src="./media/sources/frontview3.webp" width="1200"/></a><figcaption><span class="photo-name">frontview3.jpeg</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview4.webp"><img alt="frontview panorama source photograph 4" decoding="async" height="900" loading="lazy" src="./media/sources/frontview4.webp" width="1200"/></a><figcaption><span class="photo-name">frontview4.jpeg</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview5.webp"><img alt="frontview panorama source photograph 5" decoding="async" height="900" loading="lazy" src="./media/sources/frontview5.webp" width="1200"/></a><figcaption><span class="photo-name">frontview5.jpeg</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview7.webp"><img alt="frontview panorama source photograph 7" decoding="async" height="900" loading="lazy" src="./media/sources/frontview7.webp" width="1200"/></a><figcaption><span class="photo-name">frontview7.jpeg</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview8.webp"><img alt="frontview panorama source photograph 8" decoding="async" height="900" loading="lazy" src="./media/sources/frontview8.webp" width="1200"/></a><figcaption><span class="photo-name">frontview8.jpeg</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview9.webp"><img alt="frontview panorama source photograph 9" decoding="async" height="900" loading="lazy" src="./media/sources/frontview9.webp" width="1200"/></a><figcaption><span class="photo-name">frontview9.jpeg</span></figcaption></figure><figure><a data-enlarge="" href="./media/sources/frontview10.webp"><img alt="frontview panorama source photograph 10" decoding="async" height="900" loading="lazy" src="./media/sources/frontview10.webp" width="1200"/></a><figcaption><span class="photo-name">frontview10.jpeg</span></figcaption></figure></div></details></section>
+<section class="subsection" id="a2"><h3 class="subsection-title"><span class="section-number">A.2</span>Recover Homographies</h3>
+<p>I denote a point in the original image by $(x,y)$ and its corresponding point in the reference image by $(x',y')$. A homography $H$ is defined up to an overall scale. Fixing its bottom-right entry to one leaves eight unknown coefficients, $h_1,\ldots,h_8$.</p>
+<p>Each matched point pair supplies two equations: one for $x'$ and one for $y'$. Therefore, four point correspondences provide eight equations, enough to solve for the eight unknowns when the system has full rank. The points must form a nondegenerate configuration; for example, four points with three on the same line do not provide a reliable projective frame.</p>
+<div class="equation homography-derivation">
+<p class="derivation-label">1. Write the homogeneous point mapping and the eight unknowns.</p>
+\[
+\lambda_i
+\begin{bmatrix}x_i'\\y_i'\\1\end{bmatrix}
+=
+\underbrace{\begin{bmatrix}
+h_1&amp;h_2&amp;h_3\\
+h_4&amp;h_5&amp;h_6\\
+h_7&amp;h_8&amp;1
+\end{bmatrix}}_{H}
+\begin{bmatrix}x_i\\y_i\\1\end{bmatrix},
+\qquad
+\mathbf h=
+\begin{bmatrix}h_1&amp;h_2&amp;h_3&amp;h_4&amp;h_5&amp;h_6&amp;h_7&amp;h_8\end{bmatrix}^{T}.
+\]
+<p class="derivation-label">2. Expand the matrix product into three scalar equations.</p>
+\[
+\begin{aligned}
+\lambda_i x_i'&amp;=h_1x_i+h_2y_i+h_3,\\
+\lambda_i y_i'&amp;=h_4x_i+h_5y_i+h_6,\\
+\lambda_i&amp;=h_7x_i+h_8y_i+1.
+\end{aligned}
+\]
+<p class="derivation-label">3. Divide by the third coordinate to eliminate the homogeneous scale.</p>
+\[
+x_i'=\frac{h_1x_i+h_2y_i+h_3}{h_7x_i+h_8y_i+1},
+\qquad
+y_i'=\frac{h_4x_i+h_5y_i+h_6}{h_7x_i+h_8y_i+1}.
+\]
+<p class="derivation-label">4. Multiply by the common denominator, then collect the unknown coefficients.</p>
+\[
+\begin{aligned}
+x_i'(h_7x_i+h_8y_i+1)&amp;=h_1x_i+h_2y_i+h_3,\\
+y_i'(h_7x_i+h_8y_i+1)&amp;=h_4x_i+h_5y_i+h_6.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+x_i h_1+y_i h_2+h_3-x_i x_i' h_7-y_i x_i' h_8&amp;=x_i',\\
+x_i h_4+y_i h_5+h_6-x_i y_i' h_7-y_i y_i' h_8&amp;=y_i'.
+\end{aligned}
+\]
+<p class="derivation-label">5. Read off the two coefficient rows contributed by point pair i.</p>
+\[
+\underbrace{\begin{bmatrix}
+x_i&amp;y_i&amp;1&amp;0&amp;0&amp;0&amp;-x_i x_i'&amp;-y_i x_i'\\
+0&amp;0&amp;0&amp;x_i&amp;y_i&amp;1&amp;-x_i y_i'&amp;-y_i y_i'
+\end{bmatrix}}_{A_i}
+\mathbf h
+=
+\underbrace{\begin{bmatrix}x_i'\\y_i'\end{bmatrix}}_{\mathbf b_i}.
+\]
+<p class="derivation-label">6. Stack all n point pairs and solve the least-squares problem.</p>
+\[
+A=\begin{bmatrix}A_1\\A_2\\\vdots\\A_n\end{bmatrix}
+\in\mathbb R^{2n\times8},
+\qquad
+\mathbf b=\begin{bmatrix}\mathbf b_1\\\mathbf b_2\\\vdots\\\mathbf b_n\end{bmatrix}
+\in\mathbb R^{2n},
+\qquad
+\widehat{\mathbf h}
+=\underset{\mathbf h}{\arg\min}\,\|A\mathbf h-\mathbf b\|_2^2.
+\]
+
+
+</div>
+
+<h4>Homography implementation · computH.py</h4>
+<pre class="code-block"><code class="language-python"><span class="tok-k">import</span> <span class="tok-nn">numpy</span> <span class="tok-k">as</span> <span class="tok-nn">np</span>
+
+<span class="tok-k">def</span> <span class="tok-nf">computH</span>(im1_pts, im2_pts):
+    n <span class="tok-o">=</span> <span class="tok-nb">len</span>(im1_pts)
+    A <span class="tok-o">=</span> []
+    B <span class="tok-o">=</span> []
+    <span class="tok-k">for</span> i <span class="tok-k">in</span> <span class="tok-nb">range</span>(n):
+        x1 <span class="tok-o">=</span> im1_pts[i][<span class="tok-mi">0</span>]
+        y1 <span class="tok-o">=</span> im1_pts[i][<span class="tok-mi">1</span>]
+        x2 <span class="tok-o">=</span> im2_pts[i][<span class="tok-mi">0</span>]
+        y2 <span class="tok-o">=</span> im2_pts[i][<span class="tok-mi">1</span>]
+
+        A.<span class="tok-nf">append</span>([x1, y1, <span class="tok-mi">1</span>, <span class="tok-mi">0</span>, <span class="tok-mi">0</span>, <span class="tok-mi">0</span>, <span class="tok-o">-</span>x1<span class="tok-o">*</span>x2, <span class="tok-o">-</span>y1<span class="tok-o">*</span>x2])
+        A.<span class="tok-nf">append</span>([<span class="tok-mi">0</span>, <span class="tok-mi">0</span>, <span class="tok-mi">0</span>, x1, y1, <span class="tok-mi">1</span>, <span class="tok-o">-</span>x1<span class="tok-o">*</span>y2, <span class="tok-o">-</span>y1<span class="tok-o">*</span>y2])
+        B.<span class="tok-nf">append</span>([x2])
+        B.<span class="tok-nf">append</span>([y2])
+
+    A <span class="tok-o">=</span> <span class="tok-nn">np</span>.<span class="tok-nf">array</span>(A, dtype<span class="tok-o">=</span>float)
+    B <span class="tok-o">=</span> <span class="tok-nn">np</span>.<span class="tok-nf">array</span>(B, dtype<span class="tok-o">=</span>float)
+
+    <span class="tok-nb">print</span>(A.shape)
+    <span class="tok-nb">print</span>(B.shape)
+
+    <span class="tok-k">return</span> <span class="tok-nn">np</span>.linalg.<span class="tok-nf">lstsq</span>(A, B, rcond<span class="tok-o">=</span><span class="tok-k">None</span>)[<span class="tok-mi">0</span>]</code></pre>
+<div class="subtopic" id="correspondences">
+<p>For each image set, I first test the alignment on two images. I manually mark corresponding keypoints in both images, solve for the source-to-reference homography $H$, transform every source point, and measure its pixel error against the matching reference point. Coordinates use the resized 1200 × 900 images, with $x$ increasing rightward and $y$ downward.</p>
+<h4>Outside · outside4 → outside5</h4>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/homography/outside4-points.webp"><img alt="Outside4 source image annotated with ten numbered manual correspondences" decoding="async" height="900" loading="lazy" src="./media/homography/outside4-points.webp" width="1200"/></a><figcaption><span class="photo-name">Source points</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/homography/outside5-points.webp"><img alt="Outside5 reference image annotated with the same ten correspondence numbers" decoding="async" height="900" loading="lazy" src="./media/homography/outside5-points.webp" width="1200"/></a><figcaption><span class="photo-name">Reference points</span></figcaption></figure>
+</div>
+<p>The recovered source-to-reference matrix is:</p>
+<div class="equation">\[H=\begin{bmatrix}0.8744235 &amp; -0.01761828 &amp; -81.39281\\-0.03258585 &amp; 0.9238226 &amp; 36.13258\\-4.937107e-05 &amp; -3.111417e-05 &amp; 1\end{bmatrix}.\]</div>
+<p class="analysis">The RMS reprojection error over these ten fitted pairs is <strong>2.35 pixels</strong> at the working resolution. This measures consistency at the selected points; it is not an independent accuracy test. Most points lie on the rooftops, so the estimate is less constrained in the sky and near image boundaries.</p>
+<details><summary>Inspect point coordinates and reprojection errors</summary><div class="table-wrap"><table><caption>Manual point pairs at 1200 × 900 · Euclidean error after homogeneous division</caption><thead><tr><th>Point</th><th>Source (x, y)</th><th>Reference (x′, y′)</th><th>Error (px)</th></tr></thead><tbody><tr><td>1</td><td>740, 486</td><td>591, 484</td><td>4.12</td></tr>
+<tr><td>2</td><td>881, 562</td><td>724, 561</td><td>0.85</td></tr>
+<tr><td>3</td><td>618, 559</td><td>469, 561</td><td>3.29</td></tr>
+<tr><td>4</td><td>650, 576</td><td>502, 575</td><td>0.88</td></tr>
+<tr><td>5</td><td>642, 650</td><td>495, 648</td><td>1.63</td></tr>
+<tr><td>6</td><td>741, 623</td><td>586, 625</td><td>3.65</td></tr>
+<tr><td>7</td><td>789, 728</td><td>635, 726</td><td>1.81</td></tr>
+<tr><td>8</td><td>660, 757</td><td>513, 757</td><td>2.00</td></tr>
+<tr><td>9</td><td>841, 764</td><td>684, 765</td><td>1.40</td></tr>
+<tr><td>10</td><td>859, 319</td><td>700, 320</td><td>0.90</td></tr></tbody></table></div></details>
+<h4>Gateway · middle → right</h4>
+<p>I use <code>gateway2.jpeg</code>, the middle view, as the source and <code>gateway3.jpeg</code>, the right view, as the reference.</p>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/homography/gateway2-to-3-source.webp"><img alt="Gateway middle image annotated with eight numbered correspondences" decoding="async" height="900" loading="lazy" src="./media/homography/gateway2-to-3-source.webp" width="1200"/></a><figcaption><span class="photo-name">gateway2 · Middle</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/homography/gateway2-to-3-reference.webp"><img alt="Gateway right image annotated with the same eight correspondence numbers" decoding="async" height="900" loading="lazy" src="./media/homography/gateway2-to-3-reference.webp" width="1200"/></a><figcaption><span class="photo-name">gateway3 · Right</span></figcaption></figure>
+</div>
+<p>The recovered source-to-reference matrix is:</p>
+<div class="equation">\[H=\begin{bmatrix}1.631211 &amp; -0.1112188 &amp; -614.4198\\0.3154225 &amp; 1.357289 &amp; -253.7941\\0.0005344193 &amp; -7.897006e-05 &amp; 1\end{bmatrix}.\]</div>
+<p class="analysis">The RMS reprojection error over the eight fitted pairs is <strong>0.85 pixels</strong> at the working resolution.</p>
+<details><summary>Inspect Gateway point coordinates and reprojection errors</summary><div class="table-wrap"><table><caption>gateway2 → gateway3 · Euclidean error after homogeneous division</caption><thead><tr><th>Point</th><th>Source (x, y)</th><th>Reference (x′, y′)</th><th>Error (px)</th></tr></thead><tbody><tr><td>1</td><td>592, 214</td><td>251, 172</td><td>0.99</td></tr>
+<tr><td>2</td><td>518, 251</td><td>161, 199</td><td>0.23</td></tr>
+<tr><td>3</td><td>514, 346</td><td>149, 303</td><td>0.25</td></tr>
+<tr><td>4</td><td>664, 342</td><td>325, 316</td><td>0.69</td></tr>
+<tr><td>5</td><td>513, 443</td><td>141, 411</td><td>1.29</td></tr>
+<tr><td>6</td><td>665, 436</td><td>320, 415</td><td>0.74</td></tr>
+<tr><td>7</td><td>537, 547</td><td>160, 529</td><td>1.37</td></tr>
+<tr><td>8</td><td>797, 539</td><td>452, 527</td><td>0.32</td></tr></tbody></table></div></details>
+<h4>Frontview · middle → right</h4>
+<p>I use <code>frontview6.jpeg</code>, the middle view, as the source and <code>frontview7.jpeg</code>, the view immediately to its right, as the reference. This pair is also one link in the full planar panorama below.</p>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/homography/frontview6-to-7-source.webp"><img alt="Frontview middle image annotated with six numbered correspondences" decoding="async" height="900" loading="lazy" src="./media/homography/frontview6-to-7-source.webp" width="1200"/></a><figcaption><span class="photo-name">frontview6 · Middle</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/homography/frontview6-to-7-reference.webp"><img alt="Frontview right image annotated with the same six correspondence numbers" decoding="async" height="900" loading="lazy" src="./media/homography/frontview6-to-7-reference.webp" width="1200"/></a><figcaption><span class="photo-name">frontview7 · Right</span></figcaption></figure>
+</div>
+<p>The recovered source-to-reference matrix is:</p>
+<div class="equation">\[H=\begin{bmatrix}1.314751 &amp; 0.04470878 &amp; -300.8594\\0.07144179 &amp; 1.200607 &amp; -71.01109\\0.0002404683 &amp; 0.00002601267 &amp; 1\end{bmatrix}.\]</div>
+<p class="analysis">The RMS reprojection error over the six fitted pairs is <strong>0.40 pixels</strong> at the working resolution.</p>
+<details><summary>Inspect Frontview point coordinates and reprojection errors</summary><div class="table-wrap"><table><caption>frontview6 → frontview7 · Euclidean error after homogeneous division</caption><thead><tr><th>Point</th><th>Source (x, y)</th><th>Reference (x′, y′)</th><th>Error (px)</th></tr></thead><tbody><tr><td>1</td><td>614, 351</td><td>451, 341</td><td>0.37</td></tr>
+<tr><td>2</td><td>652, 353</td><td>491, 343</td><td>0.55</td></tr>
+<tr><td>3</td><td>1155, 325</td><td>958, 312</td><td>0.32</td></tr>
+<tr><td>4</td><td>687, 442</td><td>529, 432</td><td>0.45</td></tr>
+<tr><td>5</td><td>1078, 498</td><td>895, 475</td><td>0.31</td></tr>
+<tr><td>6</td><td>437, 452</td><td>263, 450</td><td>0.31</td></tr></tbody></table></div></details>
+</div>
+</section>
+<section class="subsection" id="a3">
+<h3 class="subsection-title"><span class="section-number">A.3</span>Warp the Images</h3>
+<p>I transform the four image corners to determine the output bounds. A translation then places negative coordinates on a valid canvas. To fill the destination without forward-mapping holes, each destination pixel is mapped back through $H^{-1}$ and sampled only when the source coordinate is inside the photograph.</p>
+<div class="equation">\[\begin{bmatrix}\tilde x\\\tilde y\\\tilde w\end{bmatrix}=H^{-1}\begin{bmatrix}u\\v\\1\end{bmatrix},\qquad(x,y)=\left(\frac{\tilde x}{\tilde w},\frac{\tilde y}{\tilde w}\right).\]</div>
+<p>Nearest neighbor rounds $(x,y)$ to one pixel:</p>
+<div class="equation">\[(\hat{x},\hat{y})=\bigl(\operatorname{round}(x),\operatorname{round}(y)\bigr),\qquad I_{\mathrm{NN}}(x,y)=I(\hat{x},\hat{y}).\]</div>
+<p>Bilinear sampling combines the four surrounding pixels with weights set by the fractional coordinates:</p>
+<div class="equation">\[I(x,y)=(1-d_x)(1-d_y)I_{00}+d_x(1-d_y)I_{10}+(1-d_x)d_yI_{01}+d_xd_yI_{11}.\]</div>
+<h4>Interpolation implementation · inverse_sample.py</h4>
+<pre class="code-block"><code class="language-python"><span class="tok-k">class</span> <span class="tok-nf">inverse_sample</span>():
+    <span class="tok-k">def</span> <span class="tok-nf">nearest_sample</span>(img, x, y):
+        ix <span class="tok-o">=</span> <span class="tok-nb">int</span>(<span class="tok-nb">round</span>(x))
+        iy <span class="tok-o">=</span> <span class="tok-nb">int</span>(<span class="tok-nb">round</span>(y))
+        <span class="tok-k">return</span> img[iy, ix, :]
+    <span class="tok-k">def</span> <span class="tok-nf">bilinear_sample</span>(img, x, y):
+        h, w <span class="tok-o">=</span> img.shape[:<span class="tok-mi">2</span>]
+        x0 <span class="tok-o">=</span> <span class="tok-nb">int</span>(<span class="tok-nn">np</span>.<span class="tok-nf">floor</span>(x))
+        y0 <span class="tok-o">=</span> <span class="tok-nb">int</span>(<span class="tok-nn">np</span>.<span class="tok-nf">floor</span>(y))
+        x1 <span class="tok-o">=</span> <span class="tok-nb">min</span>(x0 <span class="tok-o">+</span> <span class="tok-mi">1</span>, w <span class="tok-o">-</span> <span class="tok-mi">1</span>)
+        y1 <span class="tok-o">=</span> <span class="tok-nb">min</span>(y0 <span class="tok-o">+</span> <span class="tok-mi">1</span>, h <span class="tok-o">-</span> <span class="tok-mi">1</span>)
+        dx <span class="tok-o">=</span> x <span class="tok-o">-</span> x0
+        dy <span class="tok-o">=</span> y <span class="tok-o">-</span> y0
+        top <span class="tok-o">=</span> (<span class="tok-mi">1</span> <span class="tok-o">-</span> dx) <span class="tok-o">*</span> img[y0, x0, :] <span class="tok-o">+</span> dx <span class="tok-o">*</span> img[y0, x1, :]
+        bottom <span class="tok-o">=</span> (<span class="tok-mi">1</span> <span class="tok-o">-</span> dx) <span class="tok-o">*</span> img[y1, x0, :] <span class="tok-o">+</span> dx <span class="tok-o">*</span> img[y1, x1, :]
+
+        <span class="tok-k">return</span> (<span class="tok-mi">1</span> <span class="tok-o">-</span> dy) <span class="tok-o">*</span> top <span class="tok-o">+</span> dy <span class="tok-o">*</span> bottom</code></pre>
+<div class="subtopic" id="rect-monitor">
+<h4>Rectification 01 · The monitor</h4>
+<figure><a data-enlarge="" href="./media/rectification/monitor-points.webp"><img alt="Cropped desk view showing the oblique monitor with its four selected screen corners numbered clockwise" decoding="async" height="440" loading="lazy" src="./media/rectification/monitor-points.webp" width="600"/></a><figcaption><span class="photo-name">Selected screen corners</span></figcaption></figure>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/rectification/monitor-nearest.webp"><img alt="Rectified monitor screen using nearest neighbor interpolation" decoding="async" height="450" loading="lazy" src="./media/rectification/monitor-nearest.webp" width="800"/></a><figcaption><span class="photo-name">Nearest neighbor</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/rectification/monitor-bilinear.webp"><img alt="Rectified monitor screen using bilinear interpolation" decoding="async" height="450" loading="lazy" src="./media/rectification/monitor-bilinear.webp" width="800"/></a><figcaption><span class="photo-name">Bilinear</span></figcaption></figure>
+</div>
+</div>
+<div class="subtopic" id="rect-book">
+<h4>Rectification 02 · The book</h4>
+<figure><a data-enlarge="" href="./media/rectification/book-source.webp"><img alt="Oblique book2 photograph with the four corners of its inner white text panel numbered clockwise" decoding="async" height="900" loading="lazy" src="./media/rectification/book-source.webp" width="1200"/></a><figcaption><span class="photo-name">book2.jpeg · Oblique source</span></figcaption></figure>
+<div class="photo-grid">
+<figure class="portrait"><a data-enlarge="" href="./media/rectification/book-nearest.webp"><img alt="Book white text panel rectified to a rectangle with nearest-neighbor sampling" decoding="async" height="800" loading="lazy" src="./media/rectification/book-nearest.webp" width="560"/></a><figcaption><span class="photo-name">Nearest neighbor</span></figcaption></figure>
+<figure class="portrait"><a data-enlarge="" href="./media/rectification/book-bilinear.webp"><img alt="Book white text panel rectified to a rectangle with bilinear sampling" decoding="async" height="800" loading="lazy" src="./media/rectification/book-bilinear.webp" width="560"/></a><figcaption><span class="photo-name">Bilinear</span></figcaption></figure>
+</div>
+</div>
+<div class="subtopic" id="rect-bottle">
+<h4>Rectification 03 · The bottle</h4>
+<figure><a data-enlarge="" href="./media/rectification/bottle-source.webp"><img alt="Oblique bottle photograph tag2 with the four outer corners of its white label numbered clockwise" decoding="async" height="900" loading="lazy" src="./media/rectification/bottle-source.webp" width="1200"/></a><figcaption><span class="photo-name">Bottle 2 · Oblique source</span></figcaption></figure>
+<div class="photo-grid">
+<figure class="portrait"><a data-enlarge="" href="./media/rectification/bottle-nearest.webp"><img alt="Bottle white label rectified to a rectangle with nearest-neighbor sampling" decoding="async" height="920" loading="lazy" src="./media/rectification/bottle-nearest.webp" width="280"/></a><figcaption><span class="photo-name">Nearest neighbor</span></figcaption></figure>
+<figure class="portrait"><a data-enlarge="" href="./media/rectification/bottle-bilinear.webp"><img alt="Bottle white label rectified to a rectangle with bilinear sampling" decoding="async" height="920" loading="lazy" src="./media/rectification/bottle-bilinear.webp" width="280"/></a><figcaption><span class="photo-name">Bilinear</span></figcaption></figure>
+</div>
+</div>
+<div class="subtopic" id="interpolation">
+<h4>Interpolation · Same coordinates, different sampling</h4>
+<p>Each pair below shows the same 100 × 80 region from its rectified output, enlarged 6× with nearest-neighbor display scaling. The extra enlargement makes the original interpolation differences visible without adding another smoothing step.</p>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/rectification/monitor-nearest-detail.webp"><img alt="Six-times enlarged monitor detail from the nearest-neighbor output" decoding="async" height="480" loading="lazy" src="./media/rectification/monitor-nearest-detail.webp" width="600"/></a><figcaption><span class="photo-name">Monitor · nearest</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/rectification/monitor-bilinear-detail.webp"><img alt="Six-times enlarged monitor detail from the bilinear output" decoding="async" height="480" loading="lazy" src="./media/rectification/monitor-bilinear-detail.webp" width="600"/></a><figcaption><span class="photo-name">Monitor · bilinear</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/rectification/book-nearest-detail.webp"><img alt="Six-times enlarged book text detail from the nearest-neighbor output" decoding="async" height="480" loading="lazy" src="./media/rectification/book-nearest-detail.webp" width="600"/></a><figcaption><span class="photo-name">Book · nearest</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/rectification/book-bilinear-detail.webp"><img alt="Six-times enlarged book text detail from the bilinear output" decoding="async" height="480" loading="lazy" src="./media/rectification/book-bilinear-detail.webp" width="600"/></a><figcaption><span class="photo-name">Book · bilinear</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/rectification/bottle-nearest-detail.webp"><img alt="Six-times enlarged bottle barcode detail from the nearest-neighbor output" decoding="async" height="480" loading="lazy" src="./media/rectification/bottle-nearest-detail.webp" width="600"/></a><figcaption><span class="photo-name">Bottle · nearest</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/rectification/bottle-bilinear-detail.webp"><img alt="Six-times enlarged bottle barcode detail from the bilinear output" decoding="async" height="480" loading="lazy" src="./media/rectification/bottle-bilinear-detail.webp" width="600"/></a><figcaption><span class="photo-name">Bottle · bilinear</span></figcaption></figure>
+</div>
+<p class="analysis">Across all three examples, nearest-neighbor sampling preserves harder pixel boundaries, so text and barcode lines appear crisper, but diagonal and curved edges show more visible stair-stepping and blockiness. Bilinear sampling blends the four surrounding pixels, producing smoother transitions and less jagged geometry, while slightly softening fine text and other high-frequency detail.</p>
+</div>
+</section>
+<section class="subsection" id="a4">
+<h3 class="subsection-title"><span class="section-number">A.4</span>Blend the Images into a Mosaic</h3>
+<p>The blend splits each aligned image into a Gaussian low-frequency band and a residual high-frequency band, with $\sigma=6$. A distance transform assigns each pixel to the valid image farthest from its boundary. The high-frequency bands use that hard assignment, while normalized blurred masks mix the low-frequency colors.</p>
+<div class="equation">\[L_i=G_6*I_i,\quad R_i=I_i-L_i,\quad M_i=\mathbf1\!\left[i=\operatorname*{arg\,max}_j d_j\right],\quad S_i=\frac{G_6*M_i}{\sum_j G_6*M_j},\qquad I=\sum_{i=1}^{3}(S_iL_i+M_iR_i).\]</div>
+<h4>Blending example</h4>
+<p>Each example aligns three consecutive photographs to the middle image. Cyan, amber, and violet identify the regions assigned to the left, middle, and right photographs.</p>
+
+<div class="subtopic">
+<h4>Outside · outside4 + outside5 + outside6</h4>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/blending/outside-aligned.webp"><img alt="Outside4, outside5, and outside6 aligned on a shared canvas and averaged to reveal registration differences" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-aligned.webp" width="1685"/></a><figcaption><span class="photo-name">Aligned inputs</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/outside-reference.webp"><img alt="Outside5 placed as the middle reference image on the shared canvas" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-reference.webp" width="1685"/></a><figcaption><span class="photo-name">Middle reference</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/outside-hard-mask.webp"><img alt="Three-color hard distance mask for the Outside high-frequency bands" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-hard-mask.webp" width="1685"/></a><figcaption><span class="photo-name">High-frequency selection</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/outside-soft-mask.webp"><img alt="Gaussian-smoothed three-color mask for mixing the Outside low-frequency bands" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-soft-mask.webp" width="1685"/></a><figcaption><span class="photo-name">Low-frequency transition</span></figcaption></figure>
+</div>
+<figure class="blend-study">
+<div class="compare" data-compare="" style="--reveal: 50%">
+<img alt="Three-frame Outside panorama with two-band blending" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-blend.webp" width="1685"/>
+<div class="compare-overlay"><img alt="The same three-frame Outside panorama with hard image overwrite" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-overwrite.webp" width="1685"/></div>
+<span class="compare-label before">Overwrite</span><span class="compare-label after">Two-band blend</span><span aria-hidden="true" class="compare-divider"></span>
+</div>
+<div class="compare-control"><label for="blend-reveal-outside">Drag to compare</label><input aria-label="Percentage of the Outside overwrite result revealed" id="blend-reveal-outside" max="100" min="0" type="range" value="50"/></div>
+<figcaption><span class="photo-name">Outside · overwrite versus two-band blend</span></figcaption>
+</figure>
+<details><summary>View both Outside results side by side</summary><div class="photo-grid">
+<figure><a data-enlarge="" href="./media/blending/outside-overwrite.webp"><img alt="Three-frame Outside panorama using hard overwrite" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-overwrite.webp" width="1685"/></a><figcaption><span class="photo-name">Hard overwrite</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/outside-blend.webp"><img alt="Three-frame Outside panorama using two-band blending" decoding="async" height="1029" loading="lazy" src="./media/blending/outside-blend.webp" width="1685"/></a><figcaption><span class="photo-name">Two-band blending</span></figcaption></figure>
+</div></details>
+</div>
+
+<div class="subtopic">
+<h4>Gateway · gateway1 + gateway2 + gateway3</h4>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/blending/gateway-aligned.webp"><img alt="Gateway1, gateway2, and gateway3 aligned on a shared canvas and averaged to reveal registration differences" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-aligned.webp" width="2443"/></a><figcaption><span class="photo-name">Aligned inputs</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/gateway-reference.webp"><img alt="Gateway2 placed as the middle reference image on the shared canvas" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-reference.webp" width="2443"/></a><figcaption><span class="photo-name">Middle reference</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/gateway-hard-mask.webp"><img alt="Three-color hard distance mask for the Gateway high-frequency bands" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-hard-mask.webp" width="2443"/></a><figcaption><span class="photo-name">High-frequency selection</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/gateway-soft-mask.webp"><img alt="Gaussian-smoothed three-color mask for mixing the Gateway low-frequency bands" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-soft-mask.webp" width="2443"/></a><figcaption><span class="photo-name">Low-frequency transition</span></figcaption></figure>
+</div>
+<figure class="blend-study">
+<div class="compare" data-compare="" style="--reveal: 50%">
+<img alt="Three-frame Gateway panorama with two-band blending" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-blend.webp" width="2443"/>
+<div class="compare-overlay"><img alt="The same three-frame Gateway panorama with hard image overwrite" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-overwrite.webp" width="2443"/></div>
+<span class="compare-label before">Overwrite</span><span class="compare-label after">Two-band blend</span><span aria-hidden="true" class="compare-divider"></span>
+</div>
+<div class="compare-control"><label for="blend-reveal-gateway">Drag to compare</label><input aria-label="Percentage of the Gateway overwrite result revealed" id="blend-reveal-gateway" max="100" min="0" type="range" value="50"/></div>
+<figcaption><span class="photo-name">Gateway · overwrite versus two-band blend</span></figcaption>
+</figure>
+<details><summary>View both Gateway results side by side</summary><div class="photo-grid">
+<figure><a data-enlarge="" href="./media/blending/gateway-overwrite.webp"><img alt="Three-frame Gateway panorama using hard overwrite" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-overwrite.webp" width="2443"/></a><figcaption><span class="photo-name">Hard overwrite</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/gateway-blend.webp"><img alt="Three-frame Gateway panorama using two-band blending" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-blend.webp" width="2443"/></a><figcaption><span class="photo-name">Two-band blending</span></figcaption></figure>
+</div></details>
+</div>
+
+<div class="subtopic">
+<h4>Frontview · frontview5 + frontview6 + frontview7</h4>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/blending/frontview-aligned.webp"><img alt="Frontview5, frontview6, and frontview7 aligned on a shared canvas and averaged to reveal registration differences" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-aligned.webp" width="1718"/></a><figcaption><span class="photo-name">Aligned inputs</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/frontview-reference.webp"><img alt="Frontview6 placed as the middle reference image on the shared canvas" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-reference.webp" width="1718"/></a><figcaption><span class="photo-name">Middle reference</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/frontview-hard-mask.webp"><img alt="Three-color hard distance mask for the Frontview high-frequency bands" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-hard-mask.webp" width="1718"/></a><figcaption><span class="photo-name">High-frequency selection</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/frontview-soft-mask.webp"><img alt="Gaussian-smoothed three-color mask for mixing the Frontview low-frequency bands" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-soft-mask.webp" width="1718"/></a><figcaption><span class="photo-name">Low-frequency transition</span></figcaption></figure>
+</div>
+<figure class="blend-study">
+<div class="compare" data-compare="" style="--reveal: 50%">
+<img alt="Three-frame Frontview panorama with two-band blending" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-blend.webp" width="1718"/>
+<div class="compare-overlay"><img alt="The same three-frame Frontview panorama with hard image overwrite" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-overwrite.webp" width="1718"/></div>
+<span class="compare-label before">Overwrite</span><span class="compare-label after">Two-band blend</span><span aria-hidden="true" class="compare-divider"></span>
+</div>
+<div class="compare-control"><label for="blend-reveal-frontview">Drag to compare</label><input aria-label="Percentage of the Frontview overwrite result revealed" id="blend-reveal-frontview" max="100" min="0" type="range" value="50"/></div>
+<figcaption><span class="photo-name">Frontview · overwrite versus two-band blend</span></figcaption>
+</figure>
+<details><summary>View both Frontview results side by side</summary><div class="photo-grid">
+<figure><a data-enlarge="" href="./media/blending/frontview-overwrite.webp"><img alt="Three-frame Frontview panorama using hard overwrite" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-overwrite.webp" width="1718"/></a><figcaption><span class="photo-name">Hard overwrite</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/blending/frontview-blend.webp"><img alt="Three-frame Frontview panorama using two-band blending" decoding="async" height="1072" loading="lazy" src="./media/blending/frontview-blend.webp" width="1718"/></a><figcaption><span class="photo-name">Two-band blending</span></figcaption></figure>
+</div></details>
+</div>
+<div class="subtopic" id="mosaic-one">
+<h4>Mosaic 01 · Full neighborhood panorama</h4>
+<figure><a data-enlarge="" href="./media/mosaic/outside11-panorama.webp"><img alt="Full supplied panorama assembled from eleven overlapping outdoor neighborhood photographs" decoding="async" height="1319" loading="lazy" src="./media/mosaic/outside11-panorama.webp" width="2800"/></a></figure>
+</div>
+<div class="subtopic" id="mosaic-two">
+<h4>Mosaic 02 · Gateway</h4>
+<figure><a data-enlarge="" href="./media/blending/gateway-blend.webp"><img alt="Three-image Gateway panorama aligned to gateway2 and composited with two-band blending" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-blend.webp" width="2443"/></a></figure>
+</div>
+<div class="subtopic" id="mosaic-three">
+<h4>Mosaic 03 · Frontview Balcony</h4>
+<figure><a data-enlarge="" href="./media/mosaic/frontview-panorama.webp"><img alt="Ten-image planar sunset panorama with hills, residential rooftops, balcony railing, and hydrangea planters" decoding="async" height="1390" loading="lazy" src="./media/mosaic/frontview-panorama.webp" width="3200"/></a></figure>
+</div>
+</section>
+</section>
+<section class="reflection" id="reflection">
+<p class="eyebrow">Reflection</p><h2 class="section-title">What I Learned</h2>
+<p>I learned how to use multiple pairs of corresponding points to project one image into another. By writing the point constraints as a linear system, I can solve for the homography that describes the projective transformation between the two views. Inverse warping then lets me map every output pixel back into a source image, while nearest-neighbor or bilinear interpolation determines how its color is sampled.</p>
+<p class="analysis">Accurate point selection is essential for alignment. Even a small error in a correspondence can become a visible displacement after the homography is applied, especially far from the selected points. These errors produce ghosting, doubled edges, and larger misalignments in the final mosaic. Using well-distributed points on the same scene plane gives a much more stable estimate, although parallax from objects at different depths cannot be removed by a single homography.</p>
+<p class="analysis">Blending is closely related to the multiresolution blending from Project 2: a Laplacian pyramid preserves details at different spatial frequencies while a smooth mask creates gradual transitions between images. Here, instead of drawing a simple mask by hand, I construct the selection mask from each warped image’s distance to its boundary. Pixels farther inside an image receive more confidence, so seams naturally avoid fragile edges and the method works better with the irregular footprints produced by projective warping. I also learned that blending can hide exposure and seam differences, but it cannot compensate for inaccurate geometry; good correspondence selection and a suitable projection must come first.</p></section>
+<footer>
+<p>CS180 · Project 4, Part A · Fall 2026</p>
+</footer>
+</main>
+<dialog aria-label="Enlarged project image" class="lightbox">
+<div class="lightbox-toolbar"><p></p><button class="pill" type="button">Close ×</button></div>
+<img alt=""/>
+</dialog>
+</body>
+</html>

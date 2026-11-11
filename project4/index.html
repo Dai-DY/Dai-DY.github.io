@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="CS180 Project 4 Part A: manually selected correspondences, homographies, image rectification, inverse warping, and photo mosaics." name="description"/>
+<meta content="CS180 Project 4: manual and automatic feature matching, homographies, image rectification, inverse warping, RANSAC, and photo mosaics." name="description"/>
 <title>Project 4 | Image Warping &amp; Mosaicing</title>
 <script>window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}};</script>
 <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -31,6 +31,14 @@
 <a href="#mosaic-one">Mosaic 01 · Neighborhood</a>
 <a href="#mosaic-two">Mosaic 02 · Gateway</a>
 <a href="#mosaic-three">Mosaic 03 · Frontview</a>
+</li>
+<li class="bookmark-group">
+<a class="bookmark-heading" href="#part-b">PART B · FEATURE MATCHING</a>
+<a href="#b1">B.1 Harris corners &amp; ANMS</a>
+<a href="#b2">B.2 Feature descriptors</a>
+<a href="#b3">B.3 Feature matching</a>
+<a href="#b4">B.4 RANSAC homography</a>
+<a href="#automatic-mosaics">Manual vs. automatic mosaics</a>
 <a href="#reflection">What I learned</a>
 </li>
 </ul>
@@ -368,13 +376,146 @@ A=\begin{bmatrix}A_1\\A_2\\\vdots\\A_n\end{bmatrix}
 </div>
 </section>
 </section>
+<section class="part" id="part-b">
+<div class="part-heading"><p class="eyebrow">Part B</p></div>
+<section class="subsection" id="b1">
+<h3 class="subsection-title"><span class="section-number">B.1</span>Harris Corner Detection &amp; ANMS</h3>
+<p>I begin by converting each image to grayscale and running a single-scale Harris detector with <code>sigma=1</code>. Local response peaks are detected one pixel apart, capped at 2,000 candidates, and points within 20 pixels of an image boundary are discarded so that the later 40 × 40 descriptor window remains valid.</p>
+<p>Harris responses tend to cluster around textured regions. Adaptive Non-Maximal Suppression (ANMS) spreads the selection over the image by assigning each candidate a suppression radius to the nearest substantially stronger corner. I use <code>c_robust=0.9</code> and retain the 500 candidates with the largest radii.</p>
+<div class="equation">\[r_i^2=\min_{j:\,h_i&lt;0.9h_j}\lVert\mathbf{x}_i-\mathbf{x}_j\rVert_2^2,\qquad \mathcal{P}=\operatorname{top}_{500}\{r_i^2\}.\]</div>
+<dl class="settings">
+<div class="setting"><dt>Harris scale</dt><dd>σ = 1</dd></div>
+<div class="setting"><dt>Edge discard</dt><dd>20 px</dd></div>
+<div class="setting"><dt>Raw corners</dt><dd>1,751</dd></div>
+<div class="setting"><dt>ANMS corners</dt><dd>500</dd></div>
+</dl>
+<div class="photo-grid">
+<figure><a data-enlarge="" href="./media/partb/b1_harris_corners_1751.jpg"><img alt="Gateway image with 1,751 Harris corner candidates marked in yellow" decoding="async" height="1620" loading="lazy" src="./media/partb/b1_harris_corners_1751.jpg" width="2160"/></a><figcaption><span class="photo-name">Before ANMS</span><span class="photo-meta">1,751 Harris corners</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/partb/b1_anms_corners_500.jpg"><img alt="Gateway image with 500 spatially distributed ANMS corners marked in red" decoding="async" height="1620" loading="lazy" src="./media/partb/b1_anms_corners_500.jpg" width="2160"/></a><figcaption><span class="photo-name">After ANMS</span><span class="photo-meta">500 retained corners</span></figcaption></figure>
+</div>
+<pre class="code-block"><code class="language-python"><span class="tok-k">def</span> <span class="tok-nf">ANMS</span>(h, coords, c_robust<span class="tok-o">=</span><span class="tok-mi">0.9</span>, num_points<span class="tok-o">=</span><span class="tok-mi">500</span>):
+    points <span class="tok-o">=</span> coords.T.astype(<span class="tok-nn">np</span>.float32)
+    responses <span class="tok-o">=</span> h[coords[<span class="tok-mi">0</span>], coords[<span class="tok-mi">1</span>]]
+    N <span class="tok-o">=</span> <span class="tok-nb">len</span>(responses)
+
+    stronger <span class="tok-o">=</span> responses.reshape((N, <span class="tok-o">-</span><span class="tok-mi">1</span>)) <span class="tok-o">&lt;</span> c_robust <span class="tok-o">*</span> responses.reshape((<span class="tok-o">-</span><span class="tok-mi">1</span>, N))
+    dist <span class="tok-o">=</span> dist2(points, points)
+    dist[<span class="tok-o">~</span>stronger] <span class="tok-o">=</span> <span class="tok-nn">np</span>.inf
+    r2 <span class="tok-o">=</span> <span class="tok-nn">np</span>.min(dist, axis<span class="tok-o">=</span><span class="tok-mi">1</span>)
+
+    select_num <span class="tok-o">=</span> <span class="tok-nb">min</span>(r2.shape[<span class="tok-mi">0</span>], num_points)
+    select_point <span class="tok-o">=</span> <span class="tok-nn">np</span>.argsort(r2)[::<span class="tok-o">-</span><span class="tok-mi">1</span>][:select_num]
+
+    <span class="tok-k">return</span> r2[select_point], coords[:, select_point]</code></pre>
+<p>The implementation first stores every candidate’s image coordinates and Harris response. The Boolean <code>stronger</code> matrix identifies, for each candidate $i$, all corners $j$ whose response is sufficiently stronger according to $h_i &lt; c_{robust}h_j$. Pairwise squared distances to every other point are computed, while entries that do not satisfy this condition are set to infinity. Taking the minimum of each row therefore gives that candidate’s suppression radius. Finally, the radii are sorted from largest to smallest, and the first 500 coordinates are returned.</p>
+<p>ANMS removes many repeated responses along foliage and window edges while preserving the building outline, facade intersections, trees, and foreground details. The selected points are therefore fewer but much better distributed for estimating a homography.</p>
+</section>
+<section class="subsection" id="b2">
+<h3 class="subsection-title"><span class="section-number">B.2</span>Feature Descriptor Extraction</h3>
+<p>For every retained point, I extract an axis-aligned 40 × 40 grayscale window centered on the corner. Anti-aliased resizing reduces this window to 8 × 8, which produces a blurred 64-value descriptor and makes it less sensitive to individual pixels. I then subtract its mean and divide by its standard deviation for bias and gain normalization. Following the simplified assignment, the descriptors are not rotation invariant.</p>
+<div class="equation">\[D_i=\operatorname{vec}\!\left(\frac{\operatorname{resize}_{8\times8}(P_i)-\mu_i}{\sigma_i}\right)\in\mathbb{R}^{64}.\]</div>
+<figure><a data-enlarge="" href="./media/partb/b2_feature_descriptors.jpg"><img alt="Eight examples pairing a 40 by 40 grayscale feature patch with its normalized 8 by 8 descriptor" decoding="async" height="2400" loading="lazy" src="./media/partb/b2_feature_descriptors.jpg" width="2400"/></a></figure>
+<p>The downsampled descriptors retain coarse edge direction, brightness transitions, and corner structure while suppressing small texture variations. Mean and standard-deviation normalization lets matching compare structure rather than absolute illumination.</p>
+</section>
+<section class="subsection" id="b3">
+<h3 class="subsection-title"><span class="section-number">B.3</span>Feature Matching</h3>
+<p>I compute the squared Euclidean distance from each descriptor in the first image to every descriptor in the second. A match is retained when the best candidate is sufficiently more distinctive than the runner-up. Specifically, I apply Lowe’s nearest-neighbor ratio test with a threshold of 0.7 to the two smallest squared distances.</p>
+<div class="equation">\[d_{ij}=\lVert D_i-D_j'\rVert_2^2,\qquad \frac{d_{i,1}}{d_{i,2}}&lt;0.7.\]</div>
+<figure><a data-enlarge="" href="./media/partb/b3_feature_matches_190_pairs.jpg"><img alt="Gateway image pair with 190 descriptor matches connected by green lines" decoding="async" height="1185" loading="lazy" src="./media/partb/b3_feature_matches_190_pairs.jpg" width="3240"/></a><figcaption><span class="photo-name">Descriptor matches before geometric verification</span><span class="photo-meta">190 pairs · ratio &lt; 0.7</span></figcaption></figure>
+<p class="analysis">Most connections follow the horizontal displacement between the two views, but descriptor similarity alone still admits incorrect matches, especially among repeated windows, railings, and foliage. A geometric model is needed to reject those outliers.</p>
+</section>
+<section class="subsection" id="b4">
+<h3 class="subsection-title"><span class="section-number">B.4</span>RANSAC for Robust Homography</h3>
+<p>I estimate the homography with 4-point RANSAC. Each of 3,000 iterations samples four matches without replacement, solves the exact homography, projects every candidate, and counts points with reprojection error below 4 pixels. The model with the most inliers is selected; ties are broken by lower mean inlier error. Finally, I refit the homography by least squares using all inliers.</p>
+<div class="equation">\[H^*=\underset{H}{\arg\max}\ \sum_i\mathbf{1}\!\left[\left\lVert\pi(H\widetilde{\mathbf{x}}_i)-\mathbf{x}_i'\right\rVert_2&lt;4\right].\]</div>
+<dl class="settings">
+<div class="setting"><dt>Sample size</dt><dd>4 matches</dd></div>
+<div class="setting"><dt>Iterations</dt><dd>3,000</dd></div>
+<div class="setting"><dt>Inlier threshold</dt><dd>4 px</dd></div>
+<div class="setting"><dt>Inliers</dt><dd>157 / 190</dd></div>
+</dl>
+<figure><a data-enlarge="" href="./media/partb/b4_ransac_inliers_157_pairs.jpg"><img alt="Gateway image pair with 157 RANSAC inlier correspondences connected by green lines" decoding="async" height="1185" loading="lazy" src="./media/partb/b4_ransac_inliers_157_pairs.jpg" width="3240"/></a><figcaption><span class="photo-name">RANSAC inliers</span><span class="photo-meta">157 of 190 matches retained</span></figcaption></figure>
+<pre class="code-block"><code class="language-python"><span class="tok-k">def</span> <span class="tok-nf">RANSAC</span>(img1, img2, matches, feature_coords1, feature_coords2, N<span class="tok-o">=</span><span class="tok-mi">3000</span>):
+    all_points1 <span class="tok-o">=</span> feature_coords1[:, matches[:, <span class="tok-mi">0</span>]].T[:, ::<span class="tok-o">-</span><span class="tok-mi">1</span>]
+    all_points2 <span class="tok-o">=</span> feature_coords2[:, matches[:, <span class="tok-mi">1</span>]].T[:, ::<span class="tok-o">-</span><span class="tok-mi">1</span>]
+
+    best_inliers <span class="tok-o">=</span> <span class="tok-k">None</span>
+    best_inlier_count <span class="tok-o">=</span> <span class="tok-mi">0</span>
+    best_error <span class="tok-o">=</span> <span class="tok-nn">np</span>.inf
+    threshold <span class="tok-o">=</span> <span class="tok-mi">4.0</span>
+
+    <span class="tok-k">for</span> i <span class="tok-k">in</span> <span class="tok-nb">range</span>(N):
+        index_choice <span class="tok-o">=</span> matches[<span class="tok-nn">np</span>.random.choice(<span class="tok-nb">len</span>(matches), <span class="tok-mi">4</span>, replace<span class="tok-o">=</span><span class="tok-k">False</span>)]
+        point1_choice <span class="tok-o">=</span> feature_coords1[:, index_choice[:, <span class="tok-mi">0</span>]].T[:, ::<span class="tok-o">-</span><span class="tok-mi">1</span>]
+        point2_choice <span class="tok-o">=</span> feature_coords2[:, index_choice[:, <span class="tok-mi">1</span>]].T[:, ::<span class="tok-o">-</span><span class="tok-mi">1</span>]
+
+        flag, h <span class="tok-o">=</span> <span class="tok-nf">comput_exactH</span>(point1_choice, point2_choice)
+        <span class="tok-k">if not</span> flag:
+            <span class="tok-k">continue</span>
+
+        h <span class="tok-o">=</span> <span class="tok-nn">np</span>.asarray(h).ravel()
+        H <span class="tok-o">=</span> <span class="tok-nn">np</span>.array([
+            [h[<span class="tok-mi">0</span>], h[<span class="tok-mi">1</span>], h[<span class="tok-mi">2</span>]],
+            [h[<span class="tok-mi">3</span>], h[<span class="tok-mi">4</span>], h[<span class="tok-mi">5</span>]],
+            [h[<span class="tok-mi">6</span>], h[<span class="tok-mi">7</span>], <span class="tok-mi">1.0</span>]
+        ])
+
+        point1_h <span class="tok-o">=</span> <span class="tok-nn">np</span>.column_stack([all_points1, <span class="tok-nn">np</span>.ones(<span class="tok-nb">len</span>(all_points1))])
+        projected <span class="tok-o">=</span> (H <span class="tok-o">@</span> point1_h.T).T
+        valid <span class="tok-o">=</span> <span class="tok-nn">np</span>.abs(projected[:, <span class="tok-mi">2</span>]) <span class="tok-o">&gt;</span> <span class="tok-mi">1e-8</span>
+
+        projected_normal <span class="tok-o">=</span> <span class="tok-nn">np</span>.zeros((<span class="tok-nb">len</span>(matches), <span class="tok-mi">2</span>))
+        projected_normal[valid] <span class="tok-o">=</span> projected[valid, :<span class="tok-mi">2</span>] <span class="tok-o">/</span> projected[valid, <span class="tok-mi">2</span>:<span class="tok-mi">3</span>]
+
+        errors <span class="tok-o">=</span> <span class="tok-nn">np</span>.full(<span class="tok-nb">len</span>(matches), <span class="tok-nn">np</span>.inf)
+        errors[valid] <span class="tok-o">=</span> <span class="tok-nn">np</span>.linalg.norm(projected_normal[valid] <span class="tok-o">-</span> all_points2[valid], axis<span class="tok-o">=</span><span class="tok-mi">1</span>)
+        inliers <span class="tok-o">=</span> errors <span class="tok-o">&lt;</span> threshold
+        inlier_count <span class="tok-o">=</span> <span class="tok-nn">np</span>.sum(inliers)
+
+        <span class="tok-k">if</span> inlier_count <span class="tok-o">&lt;</span> <span class="tok-mi">4</span>:
+            <span class="tok-k">continue</span>
+
+        mean_err <span class="tok-o">=</span> <span class="tok-nn">np</span>.mean(errors[inliers])
+        <span class="tok-k">if</span> (inlier_count <span class="tok-o">&gt;</span> best_inlier_count <span class="tok-k">or</span>
+                (inlier_count <span class="tok-o">==</span> best_inlier_count <span class="tok-k">and</span> mean_err <span class="tok-o">&lt;</span> best_error)):
+            best_inliers <span class="tok-o">=</span> inliers
+            best_inlier_count <span class="tok-o">=</span> inlier_count
+            best_error <span class="tok-o">=</span> mean_err
+
+    inlier_points1 <span class="tok-o">=</span> all_points1[best_inliers]
+    inlier_points2 <span class="tok-o">=</span> all_points2[best_inliers]
+    h_final <span class="tok-o">=</span> <span class="tok-nf">computH</span>(inlier_points1, inlier_points2).ravel()
+
+    <span class="tok-k">return</span> h_final</code></pre>
+<p class="analysis">The remaining connections are visibly consistent with one projective transformation, giving a robust homography that can replace the manually selected correspondences from Part A.</p>
+<div class="subtopic" id="automatic-mosaics">
+<h4>Manual vs. Automatic Mosaics</h4>
+<h4>Comparison 01 · Neighborhood</h4>
+<div class="photo-grid placeholder-pair">
+<figure><a data-enlarge="" href="./media/mosaic/outside11-panorama.webp"><img alt="Manually aligned eleven-image neighborhood panorama from Part A" decoding="async" height="1319" loading="lazy" src="./media/mosaic/outside11-panorama.webp" width="2800"/></a><figcaption><span class="photo-name">Manual correspondences</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/partb/outside.png"><img alt="Automatically aligned neighborhood panorama using feature matching and RANSAC" decoding="async" height="814" loading="lazy" src="./media/partb/outside.png" width="1718"/></a><figcaption><span class="photo-name">Automatic feature matching</span></figcaption></figure>
+</div>
+<h4>Comparison 02 · Gateway</h4>
+<div class="photo-grid placeholder-pair">
+<figure><a data-enlarge="" href="./media/blending/gateway-blend.webp"><img alt="Manually aligned three-image Gateway panorama from Part A" decoding="async" height="1335" loading="lazy" src="./media/blending/gateway-blend.webp" width="2443"/></a><figcaption><span class="photo-name">Manual correspondences</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/partb/gateway.png"><img alt="Automatically aligned Gateway panorama using feature matching and RANSAC" decoding="async" height="913" loading="lazy" src="./media/partb/gateway.png" width="1684"/></a><figcaption><span class="photo-name">Automatic feature matching</span></figcaption></figure>
+</div>
+<h4>Comparison 03 · Frontview Balcony</h4>
+<div class="photo-grid placeholder-pair">
+<figure><a data-enlarge="" href="./media/mosaic/frontview-panorama.webp"><img alt="Manually aligned Frontview balcony panorama from Part A" decoding="async" height="1390" loading="lazy" src="./media/mosaic/frontview-panorama.webp" width="3200"/></a><figcaption><span class="photo-name">Manual correspondences</span></figcaption></figure>
+<figure><a data-enlarge="" href="./media/partb/frontview.png"><img alt="Automatically aligned Frontview balcony panorama using feature matching and RANSAC" decoding="async" height="882" loading="lazy" src="./media/partb/frontview.png" width="1719"/></a><figcaption><span class="photo-name">Automatic feature matching</span></figcaption></figure>
+</div>
+</div>
+</section>
+</section>
 <section class="reflection" id="reflection">
 <p class="eyebrow">Reflection</p><h2 class="section-title">What I Learned</h2>
 <p>I learned how to use multiple pairs of corresponding points to project one image into another. By writing the point constraints as a linear system, I can solve for the homography that describes the projective transformation between the two views. Inverse warping then lets me map every output pixel back into a source image, while nearest-neighbor or bilinear interpolation determines how its color is sampled.</p>
 <p class="analysis">Accurate point selection is essential for alignment. Even a small error in a correspondence can become a visible displacement after the homography is applied, especially far from the selected points. These errors produce ghosting, doubled edges, and larger misalignments in the final mosaic. Using well-distributed points on the same scene plane gives a much more stable estimate, although parallax from objects at different depths cannot be removed by a single homography.</p>
-<p class="analysis">Blending is closely related to the multiresolution blending from Project 2: a Laplacian pyramid preserves details at different spatial frequencies while a smooth mask creates gradual transitions between images. Here, instead of drawing a simple mask by hand, I construct the selection mask from each warped image’s distance to its boundary. Pixels farther inside an image receive more confidence, so seams naturally avoid fragile edges and the method works better with the irregular footprints produced by projective warping. I also learned that blending can hide exposure and seam differences, but it cannot compensate for inaccurate geometry; good correspondence selection and a suitable projection must come first.</p></section>
+<p class="analysis">Blending is closely related to the multiresolution blending from Project 2: a Laplacian pyramid preserves details at different spatial frequencies while a smooth mask creates gradual transitions between images. Here, instead of drawing a simple mask by hand, I construct the selection mask from each warped image’s distance to its boundary. Pixels farther inside an image receive more confidence, so seams naturally avoid fragile edges and the method works better with the irregular footprints produced by projective warping. I also learned that blending can hide exposure and seam differences, but it cannot compensate for inaccurate geometry; good correspondence selection and a suitable projection must come first.</p>
+<p class="analysis">Part B showed me why automatic stitching is a pipeline rather than a single matching step. Harris finds many repeatable candidates, ANMS improves their spatial coverage, normalized patches make local appearance comparable, and the ratio test removes ambiguous matches. Even then, visual similarity is not enough: RANSAC supplies the geometric check that turns noisy pairings into a homography suitable for mosaicing.</p></section>
 <footer>
-<p>CS180 · Project 4, Part A · Fall 2026</p>
+<p>CS180 · Project 4, Parts A &amp; B · Fall 2026</p>
 </footer>
 </main>
 <dialog aria-label="Enlarged project image" class="lightbox">
